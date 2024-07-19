@@ -5,10 +5,10 @@ import {Pool} from 'pg'
 import {drizzle} from 'drizzle-orm/node-postgres'
 
 const pool = new Pool({
-  connectionString: process.env.POSTGRES_NEXT_COURSE_URL,
+  connectionString: process.env.POSTGRES_NEXT_COURSE_URL_LOCAL,
 })
 const poolVercel = createPool({
-  connectionString: process.env.POSTGRES_NEXT_COURSE_URL,
+  connectionString: process.env.POSTGRES_NEXT_COURSE_URL_LOCAL,
 })
 
 const dbVercel = drizzle(pool, {schema: {...todos}})
