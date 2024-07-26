@@ -1,6 +1,6 @@
 import {asc, eq} from 'drizzle-orm'
-import db from './schema'
-import {AddTodo, Todo, todos} from '@/db/schema/todos'
+import db from './models'
+import {AddTodo, Todo, todos} from '@/db/models/todos'
 
 export async function getTodos(): Promise<Todo[]> {
   const result = await db.select().from(todos).orderBy(asc(todos.id))

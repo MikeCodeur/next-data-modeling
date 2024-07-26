@@ -40,9 +40,37 @@ export default function AppLayout({children}: PropsWithChildren) {
               </Link>
               <Link
                 className="flex items-center space-x-2 font-bold"
-                href="/exercises/drizzle-todos"
+                href="/exercises/drizzle-select-todos"
               >
-                <span>drizzle-todos</span>
+                <span>drizzle-select-todos</span>
+              </Link>
+
+              <Link
+                className="flex items-center space-x-2 font-bold"
+                href="/exercises/drizzle-query-todos"
+              >
+                <span>drizzle-query-todos</span>
+              </Link>
+
+              <Link
+                className="flex items-center space-x-2 font-bold"
+                href="/exercises/relations-one"
+              >
+                <span>One</span>
+              </Link>
+
+              <Link
+                className="flex items-center space-x-2 font-bold"
+                href="/exercises/relations-many"
+              >
+                <span>Many</span>
+              </Link>
+
+              <Link
+                className="flex items-center space-x-2 font-bold"
+                href="/exercises/relations-many-many"
+              >
+                <span>Many Many</span>
               </Link>
 
               <div className="hidden items-center space-x-2 md:flex"></div>
