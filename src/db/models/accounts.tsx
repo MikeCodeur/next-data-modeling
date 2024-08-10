@@ -1,6 +1,6 @@
-import {integer, pgTable, serial, numeric} from 'drizzle-orm/pg-core'
+import {integer, pgTable, serial, numeric, boolean} from 'drizzle-orm/pg-core'
 
-import {relations} from 'drizzle-orm'
+import {relations, sql} from 'drizzle-orm'
 import {users} from './users'
 
 export const accounts = pgTable('accounts', {
@@ -8,7 +8,10 @@ export const accounts = pgTable('accounts', {
   userId: integer('user_id')
     .references(() => users.id)
     .notNull(), // Clé étrangère vers users
-  balance: numeric('balance', {precision: 10, scale: 2}).default('0').notNull(),
+  balance: numeric('balance', {precision: 10, scale: 2})
+    .default(sql`0`)
+    .notNull(),
+  blocked: boolean('blocked').default(false),
 })
 
 export const accountRelations = relations(accounts, ({one}) => ({

@@ -91,11 +91,12 @@ INSERT INTO Product (title, price, description, image, category_id, quantity, cr
 -- Insérer des utilisateurs
 INSERT INTO users (name) VALUES
 ('Alice'),
-('Bob');
+('Bob'),
+('Blocked');
 
 -- Récupérer les IDs des utilisateurs nouvellement créés
 WITH user_ids AS (
-  SELECT id FROM users WHERE name IN ('Alice', 'Bob')
+  SELECT id FROM users WHERE name IN ('Alice', 'Bob', 'Blocked')
 )
 
 -- Insérer des informations de profil pour chaque utilisateur
@@ -117,11 +118,11 @@ INSERT INTO users_to_groups (user_id, group_id) VALUES
 -- Insérer des comptes liés aux utilisateurs
 
 
-INSERT INTO accounts (user_id, balance) VALUES
-((SELECT id FROM users WHERE name = 'Alice'), 1000.00),
-((SELECT id FROM users WHERE name = 'Alice'), 250.00),
-((SELECT id FROM users WHERE name = 'Bob'), 1500.00),
-((SELECT id FROM users WHERE name = 'Bob'), 500.00);
+INSERT INTO accounts (user_id, balance, blocked) VALUES
+((SELECT id FROM users WHERE name = 'Alice'), 10000.00, false),
+((SELECT id FROM users WHERE name = 'Bob'), 15000.00, false),
+((SELECT id FROM users WHERE name = 'Blocked'), 15000.00, true);
+
 
 
       `)

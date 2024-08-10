@@ -1,9 +1,10 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import {asc, eq, lt, gt} from 'drizzle-orm'
+import {asc, eq, lt, gt, sql} from 'drizzle-orm'
 import db from './models'
 import {AddTodo, Todo, todos} from '@/db/models/todos'
 import {InsertProduct, Product, products} from './models/products'
+import {accounts} from './models/accounts'
 
 export async function getTodos(): Promise<Todo[]> {
   const resultQuery = await db.query.todos.findMany({
@@ -207,4 +208,75 @@ export async function deleteProduct(id: number) {
     .where(eq(products.id, Number(id)))
     .returning()
   return rows[0]
+}
+
+//rteansaction
+export async function transferFunds(
+  accountUserId1: number,
+  accountUserId2: number,
+  amount: number
+) {
+  try {
+    const newBalance = await db.transaction(async (tx) => {
+      // Vérification du solde du compte source
+      const [account1] = await tx
+        .select()
+        .from(accounts)
+        .where(eq(accounts.userId, accountUserId1))
+
+      const [account2] = await tx
+        .select()
+        .from(accounts)
+        .where(eq(accounts.userId, accountUserId2))
+
+      if (!account1 || Number(account1.balance) < amount) {
+        await tx.rollback()
+        //throw new Error(`Insufficient funds in ${accountUserId1}'s account`)
+      }
+
+      // Débit du compte source
+      await tx
+        .update(accounts)
+        .set({balance: sql`${accounts.balance} - ${amount}`})
+        .where(eq(accounts.userId, accountUserId1))
+
+      // Crédit du compte de destination
+      await tx
+        .update(accounts)
+        .set({balance: sql`${accounts.balance} + ${amount}`})
+        .where(eq(accounts.userId, accountUserId2))
+
+      if (account1.blocked || account2.blocked) {
+        await tx.rollback()
+        //throw new Error(`One or many account are blocked`)
+      }
+      // Retourne le nouveau solde du compte source
+      const [updatedAccount1] = await tx
+        .select({balance: accounts.balance})
+        .from(accounts)
+        .where(eq(accounts.userId, accountUserId1))
+
+      return updatedAccount1.balance
+    })
+
+    console.log(
+      `Transfer successful! New balance of ${accountUserId1}: ${newBalance}`
+    )
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      console.error(`Transaction failed: ${error}`)
+    } else {
+      console.error('Transaction failed: Unknown error')
+    }
+  }
+}
+
+export async function getAccountByUserId(userId: number) {
+  // Récupérer les comptes associés à l'utilisateur spécifique
+  const userAccounts = await db
+    .select()
+    .from(accounts)
+    .where(eq(accounts.userId, userId))
+
+  return userAccounts[0]
 }

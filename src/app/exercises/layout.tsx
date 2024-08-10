@@ -86,6 +86,18 @@ export default function AppLayout({children}: PropsWithChildren) {
               >
                 <span>offset</span>
               </Link>
+              <Link
+                className="flex items-center space-x-2 font-bold"
+                href="/exercises/crud"
+              >
+                <span>crud</span>
+              </Link>
+              <Link
+                className="flex items-center space-x-2 font-bold"
+                href="/exercises/transaction"
+              >
+                <span>transaction</span>
+              </Link>
 
               <div className="hidden items-center space-x-2 md:flex"></div>
             </div>
