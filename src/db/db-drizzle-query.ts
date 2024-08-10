@@ -268,6 +268,7 @@ export async function transferFunds(
     } else {
       console.error('Transaction failed: Unknown error')
     }
+    // throw error
   }
 }
 
