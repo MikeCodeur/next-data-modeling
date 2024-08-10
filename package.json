@@ -15,9 +15,11 @@
     "db:migrate": "tsx src/db/scripts/migrate.ts",
     "db:clear": "tsx src/db/scripts/clear.ts",
     "db:check": "tsx src/db/scripts/check.ts",
+    "db:seed": "tsx src/db/scripts/seed.ts",
     "db:push": "drizzle-kit push",
     "db:drop": "drizzle-kit drop",
-    "db:studio": "drizzle-kit studio"
+    "db:studio": "drizzle-kit studio",
+    "db:reset-seed": "pnpm db:drop && pnpm db:clear && pnpm db:generate && pnpm db:migrate && pnpm db:seed"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",

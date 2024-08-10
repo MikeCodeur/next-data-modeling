@@ -1,3 +1,4 @@
+
 INSERT INTO Todo (title, isCompleted, createdAt, updatedAt) VALUES
 ('Learn TypeScript', false, '2024-01-01 10:00:00', '2024-01-01 10:00:00'),
 ('Build a Next.js App', false, '2024-01-02 11:00:00', '2024-01-02 11:00:00'),
