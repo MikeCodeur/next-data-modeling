@@ -19,17 +19,17 @@ INSERT INTO Category (name) VALUES
 ('Home Appliances'),
 ('Sports Equipment');
 
-INSERT INTO Product (id, title, price, description, image, category_id, quantity, createdat, updatedat) VALUES
-(1, 'Product 1', 19.99, 'Description for Product 1', 'image1.png', 1, 10, '2024-01-01 10:00:00', '2024-01-01 10:00:00'),
-(2, 'Product 2', 29.99, 'Description for Product 2', 'image2.png', 1, 20, '2024-01-02 11:00:00', '2024-01-02 11:00:00'),
-(3, 'Product 3', 39.99, 'Description for Product 3', 'image3.png', 2, 30, '2024-01-03 12:00:00', '2024-01-03 12:00:00'),
-(4, 'Product 4', 49.99, 'Description for Product 4', 'image4.png', 2, 40, '2024-01-04 13:00:00', '2024-01-04 13:00:00'),
-(5, 'Product 5', 59.99, 'Description for Product 5', 'image5.png', 3, 50, '2024-01-05 14:00:00', '2024-01-05 14:00:00'),
-(6, 'Product 6', 69.99, 'Description for Product 6', 'image6.png', 3, 60, '2024-01-06 15:00:00', '2024-01-06 15:00:00'),
-(7, 'Product 7', 79.99, 'Description for Product 7', 'image7.png', 4, 70, '2024-01-07 16:00:00', '2024-01-07 16:00:00'),
-(8, 'Product 8', 89.99, 'Description for Product 8', 'image8.png', 4, 80, '2024-01-08 17:00:00', '2024-01-08 17:00:00'),
-(9, 'Product 9', 99.99, 'Description for Product 9', 'image9.png', 5, 90, '2024-01-09 18:00:00', '2024-01-09 18:00:00'),
-(10, 'Product 10', 109.99, 'Description for Product 10', 'image10.png', 5, 100, '2024-01-10 19:00:00', '2024-01-10 19:00:00');
+INSERT INTO Product (title, price, description, image, category_id, quantity, createdat, updatedat) VALUES
+('Product 1', 19.99, 'Description for Product 1', 'image1.png', 1, 10, '2024-01-01 10:00:00', '2024-01-01 10:00:00'),
+('Product 2', 29.99, 'Description for Product 2', 'image2.png', 1, 20, '2024-01-02 11:00:00', '2024-01-02 11:00:00'),
+('Product 3', 39.99, 'Description for Product 3', 'image3.png', 2, 30, '2024-01-03 12:00:00', '2024-01-03 12:00:00'),
+('Product 4', 49.99, 'Description for Product 4', 'image4.png', 2, 40, '2024-01-04 13:00:00', '2024-01-04 13:00:00'),
+('Product 5', 59.99, 'Description for Product 5', 'image5.png', 3, 50, '2024-01-05 14:00:00', '2024-01-05 14:00:00'),
+('Product 6', 69.99, 'Description for Product 6', 'image6.png', 3, 60, '2024-01-06 15:00:00', '2024-01-06 15:00:00'),
+('Product 7', 79.99, 'Description for Product 7', 'image7.png', 4, 70, '2024-01-07 16:00:00', '2024-01-07 16:00:00'),
+('Product 8', 89.99, 'Description for Product 8', 'image8.png', 4, 80, '2024-01-08 17:00:00', '2024-01-08 17:00:00'),
+('Product 9', 99.99, 'Description for Product 9', 'image9.png', 5, 90, '2024-01-09 18:00:00', '2024-01-09 18:00:00'),
+('Product 10', 109.99, 'Description for Product 10', 'image10.png', 5, 100, '2024-01-10 19:00:00', '2024-01-10 19:00:00');
 
 -- Insérer des utilisateurs
 INSERT INTO users (name) VALUES
@@ -55,3 +55,16 @@ INSERT INTO users_to_groups (user_id, group_id) VALUES
 ((SELECT id FROM users WHERE name = 'Alice'), (SELECT id FROM groups WHERE name = 'Admin')),
 ((SELECT id FROM users WHERE name = 'Alice'), (SELECT id FROM groups WHERE name = 'User')),
 ((SELECT id FROM users WHERE name = 'Bob'), (SELECT id FROM groups WHERE name = 'User'));
+
+
+-- Insérer des comptes liés aux utilisateurs
+
+
+INSERT INTO accounts (user_id, balance) 
+SELECT id, 1000.00 FROM user_ids WHERE name = 'Alice';
+
+INSERT INTO accounts (user_id, balance) 
+SELECT id, 250.00 FROM user_ids WHERE name = 'Alice';
+
+INSERT INTO accounts (user_id, balance) 
+SELECT id, 1500.00 FROM user_ids WHERE name = 'Bob';

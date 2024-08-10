@@ -7,6 +7,7 @@ import {
   text,
 } from 'drizzle-orm/pg-core'
 import {relations} from 'drizzle-orm'
+import {accounts} from './accounts'
 
 export const users = pgTable('users', {
   id: serial('id').primaryKey(),
@@ -26,6 +27,7 @@ export const profileInfo = pgTable('profile_info', {
 
 export const usersRelations = relations(users, ({many}) => ({
   usersToGroups: many(usersToGroups),
+  accounts: many(accounts),
 }))
 export const groups = pgTable('groups', {
   id: serial('id').primaryKey(),

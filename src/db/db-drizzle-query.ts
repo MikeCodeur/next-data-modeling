@@ -3,6 +3,7 @@
 import {asc, eq, lt, gt} from 'drizzle-orm'
 import db from './models'
 import {AddTodo, Todo, todos} from '@/db/models/todos'
+import {InsertProduct, Product, products} from './models/products'
 
 export async function getTodos(): Promise<Todo[]> {
   const resultQuery = await db.query.todos.findMany({
@@ -172,4 +173,38 @@ export async function getProductPagination(nbElement: number, start: number) {
   })
 
   return resultQuery
+}
+
+//INSERT
+export async function insertProduct(product: InsertProduct) {
+  const rows = await db.insert(products).values(product).returning()
+  return rows[0]
+}
+export async function insertProducts(productArray: InsertProduct[]) {
+  const rows = await db.insert(products).values(productArray).returning()
+  return rows
+}
+export async function updateProduct(product: Product): Promise<Product> {
+  const rows = await db
+    .update(products)
+    .set(product)
+    .where(eq(products.id, product.id))
+    .returning()
+  return rows[0]
+}
+
+export async function getProductById(id: number): Promise<Product | null> {
+  const rows = await db
+    .select()
+    .from(products)
+    .where(eq(products.id, Number(id)))
+  return rows[0]
+}
+
+export async function deleteProduct(id: number) {
+  const rows = await db
+    .delete(products)
+    .where(eq(products.id, Number(id)))
+    .returning()
+  return rows[0]
 }
