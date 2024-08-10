@@ -24,14 +24,12 @@ export default function AppLayout({children}: PropsWithChildren) {
               >
                 <span>Home</span>
               </Link>
-
               <Link
                 className="flex items-center space-x-2 font-bold"
                 href="/instructions"
               >
                 <span>Instructions</span>
               </Link>
-
               <Link
                 className="flex items-center space-x-2 font-bold"
                 href="/exercises/native-sql"
@@ -44,33 +42,49 @@ export default function AppLayout({children}: PropsWithChildren) {
               >
                 <span>drizzle-select-todos</span>
               </Link>
-
               <Link
                 className="flex items-center space-x-2 font-bold"
                 href="/exercises/drizzle-query-todos"
               >
                 <span>drizzle-query-todos</span>
               </Link>
-
               <Link
                 className="flex items-center space-x-2 font-bold"
                 href="/exercises/relations-one"
               >
                 <span>One</span>
               </Link>
-
               <Link
                 className="flex items-center space-x-2 font-bold"
                 href="/exercises/relations-many"
               >
                 <span>Many</span>
               </Link>
-
               <Link
                 className="flex items-center space-x-2 font-bold"
                 href="/exercises/relations-many-many"
               >
                 <span>Many Many</span>
+              </Link>
+              <Link
+                className="flex items-center space-x-2 font-bold"
+                href="/exercises/partial-fields"
+              >
+                <span>partial-fields</span>
+              </Link>
+
+              <Link
+                className="flex items-center space-x-2 font-bold"
+                href="/exercises/filter"
+              >
+                <span>filter</span>
+              </Link>
+
+              <Link
+                className="flex items-center space-x-2 font-bold"
+                href="/exercises/offset"
+              >
+                <span>offset</span>
               </Link>
 
               <div className="hidden items-center space-x-2 md:flex"></div>

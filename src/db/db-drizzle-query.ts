@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import {asc, eq} from 'drizzle-orm'
+import {asc, eq, lt, gt} from 'drizzle-orm'
 import db from './models'
 import {AddTodo, Todo, todos} from '@/db/models/todos'
 
@@ -124,4 +124,52 @@ export async function getUsersByGroup(groupName: string) {
   )
 
   return usersByGroup
+}
+
+//partial field
+
+export async function getProductTiteCategoryName() {
+  const resultQuery = await db.query.products.findMany({
+    columns: {
+      id: true,
+      title: true,
+    },
+    with: {
+      category: {
+        columns: {
+          id: true,
+          name: true,
+        },
+      },
+    },
+    orderBy: (products, {asc}) => [asc(products.id)],
+  })
+
+  return resultQuery
+}
+
+//filter
+export async function getProductFilterName(name: string) {
+  const resultQuery = await db.query.products.findMany({
+    where: (products, {eq}) => eq(products.title, name),
+    with: {
+      category: true,
+    },
+  })
+
+  return resultQuery
+}
+//offset
+export async function getProductPagination(nbElement: number, start: number) {
+  const resultQuery = await db.query.products.findMany({
+    where: (products, {gt}) => gt(products.id, 1),
+    limit: nbElement,
+    offset: start,
+    with: {
+      category: true,
+    },
+    orderBy: (product, {asc}) => [asc(product.id)],
+  })
+
+  return resultQuery
 }
