@@ -230,8 +230,8 @@ export async function transferFunds(
         .where(eq(accounts.userId, accountUserId2))
 
       if (!account1 || Number(account1.balance) < amount) {
-        await tx.rollback()
-        //throw new Error(`Insufficient funds in ${accountUserId1}'s account`)
+        //  await tx.rollback()
+        throw new Error(`Insufficient funds in ${accountUserId1}'s account`)
       }
 
       // Débit du compte source
@@ -247,8 +247,8 @@ export async function transferFunds(
         .where(eq(accounts.userId, accountUserId2))
 
       if (account1.blocked || account2.blocked) {
-        await tx.rollback()
-        //throw new Error(`One or many account are blocked`)
+        // await tx.rollback()
+        throw new Error(`One or many account are blocked`)
       }
       // Retourne le nouveau solde du compte source
       const [updatedAccount1] = await tx
@@ -264,11 +264,11 @@ export async function transferFunds(
     )
   } catch (error: unknown) {
     if (error instanceof Error) {
-      console.error(`Transaction failed: ${error}`)
+      console.error(`Transaction failed: ${error.message}`)
     } else {
       console.error('Transaction failed: Unknown error')
     }
-    // throw error
+    throw error
   }
 }
 

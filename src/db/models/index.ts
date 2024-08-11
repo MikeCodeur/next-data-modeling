@@ -8,7 +8,9 @@ import * as accounts from '@/db/models/accounts'
 import {Pool} from 'pg'
 import {drizzle} from 'drizzle-orm/node-postgres'
 import {DefaultLogger, LogWriter} from 'drizzle-orm/logger'
+
 class MyLogWriter implements LogWriter {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   write(message: string) {
     // Write to file, stdout, etc.
     //console.log('logger', message)
