@@ -281,3 +281,33 @@ export async function getAccountByUserId(userId: number) {
 
   return userAccounts[0]
 }
+export async function truncateTables() {
+  try {
+    // Désactiver temporairement les contraintes de clé étrangère
+    await db.execute(sql`SET session_replication_role = 'replica';`)
+
+    // Troncature des tables
+    // await db.execute(
+    //   sql`TRUNCATE TABLE users_to_groups RESTART IDENTITY CASCADE;`
+    // )
+    await db.execute(sql`TRUNCATE TABLE profile_info RESTART IDENTITY CASCADE;`)
+    await db.execute(sql`TRUNCATE TABLE accounts RESTART IDENTITY CASCADE;`)
+    await db.execute(sql`TRUNCATE TABLE product RESTART IDENTITY CASCADE;`)
+    await db.execute(sql`TRUNCATE TABLE category RESTART IDENTITY CASCADE;`)
+    await db.execute(sql`TRUNCATE TABLE todo RESTART IDENTITY CASCADE;`)
+    await db.execute(sql`TRUNCATE TABLE users RESTART IDENTITY CASCADE;`)
+    await db.execute(sql`TRUNCATE TABLE groups RESTART IDENTITY CASCADE;`)
+
+    // Réactiver les contraintes de clé étrangère
+    // await db.execute(sql`SET session_replication_role = 'origin';`)
+
+    console.log('Tables truncated successfully')
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      console.error(`Failed to truncate tables: ${error.message}`)
+    } else {
+      console.error('Failed to truncate tables: Unknown error')
+    }
+    throw error
+  }
+}
