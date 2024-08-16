@@ -19,10 +19,10 @@ class MyLogWriter implements LogWriter {
 const logger = new DefaultLogger({writer: new MyLogWriter()})
 
 const pool = new Pool({
-  connectionString: process.env.POSTGRES_NEXT_COURSE_URL_LOCAL,
+  connectionString: process.env.POSTGRES_NEXT_COURSE_URL,
 })
 const poolVercel = createPool({
-  connectionString: process.env.POSTGRES_NEXT_COURSE_URL_LOCAL,
+  connectionString: process.env.POSTGRES_NEXT_COURSE_URL,
 })
 
 const dbVercel = drizzle(pool, {

@@ -1,9 +1,9 @@
-import {Transfert} from '@/components/transfert'
+import {Transfert} from './transfert'
 import {getAccountByUserId} from '@/db/db-drizzle-query'
 
 export default async function Products() {
-  const fromAcc = 1
-  const toAcc = 3 //3 is blocked account
+  const fromAcc = 2
+  const toAcc = 1 //3 is blocked account
   const acc1 = await getAccountByUserId(fromAcc)
   console.log(`acc1 balance is ${acc1.balance}`)
   const acc2 = await getAccountByUserId(toAcc)

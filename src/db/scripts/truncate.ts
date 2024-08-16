@@ -9,12 +9,12 @@ import {sql} from 'drizzle-orm'
 dotenv.config()
 
 const runTruncate = async () => {
-  if (!process.env.DATABASE_URL) {
-    throw new Error('DATABASE_URL is not defined')
+  if (!process.env.POSTGRES_NEXT_COURSE_URL) {
+    throw new Error('POSTGRES_NEXT_COURSE_URL is not defined')
   }
 
   const client = new pg.Client({
-    connectionString: process.env.DATABASE_URL,
+    connectionString: process.env.POSTGRES_NEXT_COURSE_URL,
   })
 
   await client.connect()
