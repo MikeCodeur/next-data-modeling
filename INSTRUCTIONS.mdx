@@ -1,6 +1,6 @@
-# Comprendre l’hydratation
+# Client / Pool et Requête SQL Native
 
-### 💡 Comprendre l’hydratation et gérer les Errors/Warning
+### 💡 Créer un Pool et une requête SQL
 
 ## 📝 Tes notes
 
@@ -8,149 +8,252 @@ Detaille ce que tu as appris ici, sur une page [Notion](https://go.mikecodeu
 
 ## Comprendre
 
-Dans les modules précèdent nous avons vu
+Une fois que nous avons notre base de données installé correctement et que nous avons toutes les informations de connexion, il est possible de créer un client qui va se connecter à notre base de données.
 
-- Le rendu coté server (SSR) avec les React Server Components.
-- Le rendu coté client (CSR) avec les React Client Components.
+Les connexions base de données nécessites une ouverture de connexion et une fermeture.
 
-Nous allons aller plus en profondeur sur la manière dont Next gère tout cela. Rappel sur le SSR
-
-- Tout d'abord, toutes les données pour une page donnée sont récupérées sur le serveur.
-- Ensuite, le serveur rend le HTML pour la page.
-- Le HTML, le CSS et le JavaScript de la page sont envoyés au client.
-- Une interface utilisateur non interactive est affichée en utilisant le HTML et le CSS générés.
-- Enfin, React **hydrate** l'interface utilisateur pour la rendre interactive.
-
-![img](/course/server-rendering-without-streaming-chart.avif)
-
-📑 Le liens vers la doc [https://rc.nextjs.org/docs/app/building-your-application/routing/loading-ui-and-streaming#what-is-streaming](https://rc.nextjs.org/docs/app/building-your-application/routing/loading-ui-and-streaming#what-is-streaming)
-
-On pourrait croire que le processus `SSR` ne concerne que les composants server (RSC). Par exemple dans cet arbre de composant, on pourrait penser que le rendu SSR concerne les RSC et le rendu des RCC se fait uniquement du coté client (`CSR`).
-
-![img](/course/rcc-rsc-tree.png)
-
-En réalité le SSR concerne tout l’arbre de composants. RSC et RCC compris. Les RCC sont donc rendus 2 fois.
-
-Par exemple, ce RCC est rendu **une fois sur le server** sans code client (interaction client etc …) Par exemple ce composant est rendu
+### Exemple avec avec [Vercel Postgres](https://vercel.com/docs/storage/vercel-postgres/sdk)
 
 ```tsx
-export default function ClientComponent() {
-	const handleClick = () => {alert('Hi')}
-	return (
-    <button onClick={handleClick}>Click here</button>
-  )
+import { createClient } from '@vercel/postgres';
+
+async function queryPosts() {
+  const client = createClient();
+  await client.connect();
+
+  try {
+    const likes = 100;
+    const { rows, fields } =
+      await client.sql`SELECT * FROM posts WHERE likes > ${likes};`;
+  } finally {
+    await client.end();
+  }
 }
 ```
 
-Devient SSR
+`Vercel` nous simplifie cette tache la en utilisant `sql`
+
+Il se base sur une variable d’environnement (`process.env.POSTGRES_URL`) pour creer une client / pool de connexion
+
+📑 Le lien vers la doc : [https://vercel.com/docs/storage/vercel-postgres/sdk#sql](https://vercel.com/docs/storage/vercel-postgres/sdk#sql)
+
+Cela simplifie grandement l’écriture de RSC
 
 ```tsx
-<button>Click here</button>
-```
+import { sql } from "@vercel/postgres";
 
-**Et un rendu ensuite sur le client avec hydration (ajout des events et code)**
+export default async function Cart({
+  params
+} : {
+  params: { user: string }
+}): Promise<JSX.Element> {
+  const { rows } = await sql`SELECT * from CARTS where user_id=${params.user}`;
 
-```tsx
-//handleClick est contenu dans le bundle/chunk.js
-<button onClick={handleClick}>Click here</button>
-```
-
-On a déjà vu plusieurs fois les bénéfice de ce type de découpage. Mais il faut bien prendre en compte que 2 rendus distinct sont fait. Et pour pouvoir hydrater correctement les contenus doivent être cohérent et identiques. Si le contenu rendu sur le server, diffère du contenu rendu sur le client, des warnings et erreurs sont lévés. Prenons l’exemple suivant :
-
-```tsx
-export default function ClientComponent() {
-	const date = new Date().toString()
-	return (
+  return (
     <div>
-      {date}
+      {rows.map((row) => (
+        <div key={row.id}>
+          {row.id} - {row.quantity}
+        </div>
+      ))}
     </div>
-  )
+  );
 }
-// SSR date : Tue Jul 02 2024 14:18:53 GMT+0800
-// Le rendu client arrive après
-// CSR date : Tue Jul 02 2024 14:18:54 GMT+0800
 ```
 
-Next va alors lever une errors
+### Exemple avec avec [Node-Postges](https://orm.drizzle.team/docs/get-started-postgresql#node-postgres)
+
+- Création du client
 
 ```tsx
-Unhandled Runtime Error
-Error: Text content does not match server-rendered HTML.
-See more info here: https://nextjs.org/docs/messages/react-hydration-error
+import { Client } from "pg";
 
-Text content did not match. Server: "Tue Jul 02 2024 14:27:43 GMT+0800 (Singapore Standard Time)" Client: "Tue Jul 02 2024 14:27:44 GMT+0800 (heure de Singapour)"
+const client = new Client({
+  connectionString: "postgres://user:password@host:port/db",
+});
+// or
+const client = new Client({
+  host: "127.0.0.1",
+  port: 5432,
+  user: "postgres",
+  password: "password",
+  database: "db_name",
+});
 
-En production :
-Error: Minified React error #425
+//connexion
+await client.connect();
+//fermeture
+await client.end();
 ```
 
-## Exercice
+Faire une requête
 
-**🐶** Dans cet exercice tu vas devoir corriger les erreurs et warnings liés à l’hydratation.
+```tsx
+const {rows} = await client.query<User>(`SELECT id,
+    name,
+    createdat AS "createdAt",
+    updatedat AS "updatedAt" from User`)
+```
 
-- Errors :
-  - Imbrication div dans `<p>`
-  - Pour la `date`, split supprime le temps (HH MM SS)
-- Warning
-  - Utilise `suppressHydrationWarning` dans un élément html
-    - Doc : https://nextjs.org/docs/messages/react-hydration-error#solution-3-using-suppresshydrationwarning
+### POOL de connexions
+
+Maintenir une connexion est couteux en ressource et difficile à gérer. Dans une application il est parfois nécessaire d’avoir de multiples connexions pour que l’application soit efficace.
+
+Un pool de connexions est un mécanisme qui gère efficacement les connexions à une base de données en maintenant un ensemble de connexions ouvertes pour être réutilisées par différentes requêtes. Cela évite le coût de créer et fermer une nouvelle connexion à chaque requête, améliorant ainsi les performances de l'application. Il permet aussi de limiter et d'optimiser l'utilisation des ressources en contrôlant le nombre de connexions simultanées.
+
+### Initialisation de la BDD
+
+Comme nous BDD est vierge, nous allons créer une table `Todo` avec des données pour voir faire des requêtes SQL dessus. Pour cela dans le dossier `src/db/scripts` il y a des scripts utils pour gerer cela.
+
+- `create-tables.sql` : Permet de créer des tables
+- `seed.sql` : Permet d’insérer des données
+- `drop.sql` : Permet supprimer toutes les tables
+
+Nous en ajouterons d’autres par la suite
+
+Pour commencer ajoutons des `Todos`
+
+```sql
+CREATE TABLE Todo (
+  id SERIAL PRIMARY KEY,
+  title VARCHAR(255) NOT NULL,
+  isCompleted BOOLEAN NOT NULL,
+  createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+INSERT INTO Todo (title, isCompleted, createdAt, updatedAt) VALUES
+('Learn TypeScript', false, '2024-01-01 10:00:00', '2024-01-01 10:00:00'),
+('Build a Next.js App', false, '2024-01-02 11:00:00', '2024-01-02 11:00:00'),
+('Write a Blog Post', true, '2024-01-03 09:00:00', '2024-01-03 09:00:00'),
+('Create a YouTube Video', false, '2024-01-04 14:00:00', '2024-01-04 14:00:00'),
+('Read a Technical Book', true, '2024-01-05 08:00:00', '2024-01-05 08:00:00'),
+('Update Portfolio', false, '2024-01-06 15:00:00', '2024-01-06 15:00:00'),
+('Attend a Webinar', true, '2024-01-07 12:00:00', '2024-01-07 12:00:00'),
+('Practice Coding Challenges', false, '2024-01-08 17:00:00', '2024-01-08 17:00:00'),
+('Network with Peers', false, '2024-01-09 13:00:00', '2024-01-09 13:00:00'),
+('Plan Next Month’s Goals', true, '2024-01-10 18:00:00', '2024-01-10 18:00:00');
+```
 
 <aside>
-💡 Rafraichie la page (F5) et navigue pour voir la différence de comportement
+💡 Cette requête fonctionne en local ou sur Vercel
 
 </aside>
 
+Dans cet exercice nous allons essayer les deux approche : En local et en hébergé sur `Vercel`. Une fois la connexion etablie sur un server. Le reste des exercices devraient être transparent
+
+## Exercice
+
+### Base de données local
+
+Dans cet exercice tu vas devoir créer un client qui va se connecter vers la base de données et récupérer les `Todo`. Tu vas devoir
+
+- Utilise le client `pg`,
+- créer une instance
+- Ouvrir la connexion
+- Exécuter la requête SQL
+- Fermer la connexion
+
+```tsx
+import {Client} from 'pg'
+```
+
 Fichiers
 
-- `exercises/hydration/client-component.tsx`
+- `exercise/client-pool/page`
 
 ## Bonus
 
-### 1. 🚀 render après hydration
+### 1. 🚀 Créer un Pool de connexion
 
-Dans l’exercice précédent nous avons corrigé les erreurs d’hydrations mais les comportements ne sont pas ceux que nous souhaitons.
+Il est préférable d’utiliser un pool de connexion pour plus de simplicité et d’efficacité.
 
-- La Date a du être tronquée (or nous voulons afficher une vrai `date and time`)
-- Le rendu est bleu (serveur) or il devrait être rouge (client)
-
-Il manque une dernière étape (si le rendu client diffère du serveur), il manque un rendering. Il faut garder ce schéma en tête
+Notre librairie nous permet de gérer cela avec
 
 ```tsx
-SSR -> Client Loading -> Hydration -> CSR (useEffect)
-// utilise le composant <Phases> pour logger les differentes phases
+import {Pool} from 'pg'
+
+const pool = new Pool({
+    connectionString:
+      'postgres://postgres:postgres@localhost:5432/postgres?sslmode=disable',
+  })
 ```
 
-Pour effectuer un rendu supplémentaire ET qui ne pose pas de problème de d’hydratation il est possible d’utiliser
+**🐶** Adapte le code pour utiliser un Pool de connexion
 
-```tsx
-const [hydrated, setHydrated] = useState(false)
-...
-useEffect(() => {
-  setHydrated(true)
-}, [])
-
- return <div>{hydrated? 'This is never prerendered' : 'Prerendered'}</div>
-```
-
-### Explication
-
-- Lors du SSR `hydrated` est `false`
-- Lors de l’hydratation `hydrated` est toujours à `false` (pas d’erreur)
-- Après hydratation nous utilisons `useEffect` pour effectuer `en re-render`
-
-🐶 Utilise cet technique pour afficher correctement la Date et le Style (blue/Red) en te basant sur `hydrated`.
-
-- Remet : **🤖**`const date = new Date().toString()`
-
-ps : tu peux supprimer `suppressHydrationWarning` car il ne devrait pas y avoir de warning sur le style
+- instancie `new Pool`
+- Supprime les connexions et déconnections car ils ne sont plus utiles
 
 Fichiers
 
-- `exercises/hydration/client-component.tsx`
+- `exercise/client-pool/page`
+
+### 2. 🚀 Faire la même chose avec Vercel Postgree
+
+Si ta base de données est sur `Vercel` il va falloir utiliser la librairie vercel et creer un Pool Vercel
+
+```tsx
+import {createPool} from '@vercel/postgres'
+
+const pool = createPool({
+  connectionString:
+    'postgres://default:pass@hostname:5432/verceldb?sslmode=require',
+})
+```
+
+Au lieu d’utiliser
+
+```tsx
+//pg
+const {rows} = await pool.query<Todo>(`SELECT ...`)
+
+//vercel
+const {rows} = await pool.sql<Todo>(`SELECT ...`)
+```
+
+Fichiers
+
+- `exercise/client-pool/page`
+
+### 2. 🚀 Variables d’environnement
+
+Les adresses de connexions aux serveurs de base de données varient en fonction de l’environnement
+
+- developpement
+- production
+- test
+
+Il n’est donc pas conseiller de mettre les informations de connexion dans le code (cela pose également des problèmes de sécurité).
+
+A la place nous utilisons des variables d’environnements.
+
+- `.env.development`
+- `.env.production`
+
+### Ordre de priorité des fichiers `.env` dans Next.js :
+
+1. **.env.local** : Ce fichier est toujours chargé, quelle que soit l'environnement (`development`, `production`, etc.). Il est utile pour stocker des variables d'environnement spécifiques à la machine locale, et ce fichier est généralement ignoré par Git.
+2. **.env.development** : Ce fichier est chargé uniquement en mode développement (`next dev`). Il contient des variables d'environnement spécifiques au développement.
+3. **.env.production** : Ce fichier est chargé uniquement en mode production (`next start`). Il contient des variables d'environnement spécifiques à la production.
+4. **.env.test** : Ce fichier est chargé uniquement en mode test (`next test` ou lors de l'exécution de tests).
+5. **.env** : Ce fichier est une sorte de "fallback" pour toutes les configurations. S'il n'existe pas de fichier spécifique à l'environnement actuel, Next.js utilisera les variables définies dans ce fichier.
+
+<aside>
+💡 La priorité est toujours faite à la variable d’environnement présente sur la machine
+
+</aside>
+
+**🐶 Dans cet exercice adapte le code pour qu’il utilise la bonne variable d’environnement et modifie les fichier .env pour contenir la connexion a ta base de données.**
+
+Fichiers
+
+- `exercise/client-pool/page`
+- `.env.development`
+- `.env.production`
 
 ## Aller plus loin
 
-📑 Le lien vers la doc [https://nextjs.org/docs/messages/react-hydration-error](https://nextjs.org/docs/messages/react-hydration-error)
+📑 Le lien vers la doc [https://www.w3schools.com/html/html_css.asp](https://www.w3schools.com/html/html_css.asp)
 
 ## Ils vont t’aider
 
@@ -162,4 +265,4 @@ Fichiers
 
 ## 🐜 Feedback
 
-Remplir le formulaire le [formulaire de FeedBack](https://go.mikecodeur.com/cours-next-avis?entry.1912869708=Next%20PRO&entry.1430994900=Rendering%20Avancée&entry.533578441=08%20hydration).
+Remplir le formulaire le [formulaire de FeedBack](https://go.mikecodeur.com/cours-next-avis?entry.1912869708=Next%20PRO&entry.1430994900=Data%20Modeling&entry.533578441=01%20Client%20Pool).

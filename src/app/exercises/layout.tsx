@@ -31,6 +31,12 @@ export default function AppLayout({children}: PropsWithChildren) {
               >
                 <span>Instructions</span>
               </Link>
+              <Link
+                className="flex items-center space-x-2 font-bold"
+                href="/exercises/client-pool"
+              >
+                <span>Client-Pool</span>
+              </Link>
 
               <div className="hidden items-center space-x-2 md:flex"></div>
             </div>
