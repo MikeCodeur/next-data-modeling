@@ -37,6 +37,12 @@ export default function AppLayout({children}: PropsWithChildren) {
               >
                 <span>Client-Pool</span>
               </Link>
+              <Link
+                className="flex items-center space-x-2 font-bold"
+                href="/exercises/native-todo"
+              >
+                <span>Native SQL</span>
+              </Link>
 
               <div className="hidden items-center space-x-2 md:flex"></div>
             </div>

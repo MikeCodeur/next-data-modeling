@@ -11,15 +11,15 @@ export type Product = {
   category?: CategoriesEnum
   quantity?: number
   createdAt?: string
-  updadtedAt?: string
+  updatedAt?: string
 }
 
 export type Todo = {
   id: number
   title: string
   isCompleted: boolean
-  createdAt?: string
-  updadtedAt?: string
+  createdAt?: Date
+  updatedAt?: Date
 }
 export enum RoleEnum {
   USER = 'USER',
