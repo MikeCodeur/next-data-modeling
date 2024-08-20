@@ -1,12 +1,40 @@
-export {default} from './page.exercise'
+import {Todo} from '@/lib/type'
+import {createPool} from '@vercel/postgres'
 
-//export {default} from './page.final'
+export const fetchCache = 'force-no-store'
 
-//1. 🚀 Créer un Pool de connexion
-//export {default} from './page.bonus-1'
+const pool = createPool({
+  connectionString:
+    // 🐶 Remplace les informations de connexion par celles de ton compte Vercel
+    process.env.POSTGRES_URL,
+})
 
-//2. 🚀 Faire la même chose avec Vercel Postgree
-//export {default} from './page.bonus-2'
+async function getTodos() {
+  const {rows} = await pool.sql<Todo>`SELECT id,
+         title,
+         iscompleted AS "isCompleted",
+         createdat AS "createdAt",
+         updatedat AS "updatedAt" from Todo `
+  return rows
+}
 
-//3. 🚀 Variables d’environnement
-//export {default} from './page.bonus-3'
+export default async function Page() {
+  const rows = await getTodos()
+
+  return (
+    <div className="mx-auto max-w-2xl p-6 text-lg">
+      <h1 className="mb-4 text-center text-3xl font-bold">Todo List</h1>
+      {rows.map((todo) => (
+        <div key={todo.id}>
+          <input
+            type="checkbox"
+            id={todo.id.toString()}
+            name={todo.title}
+            defaultChecked={todo.isCompleted}
+          ></input>
+          <label htmlFor={todo.id.toString()}>{todo.title}</label>
+        </div>
+      ))}
+    </div>
+  )
+}

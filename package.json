@@ -2,14 +2,20 @@
   "name": "next-course-template",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
-    "dev": "next dev",
+    "dev": "pnpm db:check && next dev",
     "build": "next build",
     "start": "next start",
     "prod": "pnpm build && pnpm start",
     "lint": "next lint",
     "format": "prettier . --check",
-    "format:fix": "prettier . --write"
+    "format:fix": "prettier . --write",
+    "db:check": "tsx src/db/scripts/check.ts",
+    "db:clear": "tsx src/db/scripts/clear.ts",
+    "db:push": "tsx src/db/scripts/create.ts",
+    "db:seed": "tsx src/db/scripts/seed.ts",
+    "db:reset-seed": "pnpm db:clear && pnpm db:push && pnpm db:seed"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",
@@ -70,6 +76,7 @@
     "prettier": "^3.3.3",
     "prettier-plugin-tailwindcss": "^0.5.14",
     "tailwindcss": "^3.4.10",
+    "tsx": "^4.17.0",
     "typescript": "^5.5.4"
   }
 }
