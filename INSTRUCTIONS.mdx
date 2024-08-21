@@ -1,6 +1,6 @@
-# ORM - Modélisation avec Drizzle
+# Drizzle KIT - Génération / Migration
 
-### 💡 Initialisation et Modélisation avec Drizzle
+### 💡 Utiliser Drizzle KIT
 
 ## 📝 Tes notes
 
@@ -8,151 +8,116 @@ Detaille ce que tu as appris ici, sur une page [Notion](https://go.mikecodeu
 
 ## Comprendre
 
-Le but d'un ORM (Object-Relational Mapping) est de simplifier et d'abstraire l'interaction entre une application et une base de données relationnelle en permettant aux développeurs de manipuler les données de la base de données sous forme d'objets dans le code, plutôt que d'écrire des requêtes SQL directement comme nous l’avons fait dans les sections précédentes.
+Il est important d’avoir une codebase en phase avec la modélisation de notre base de données. Dans les modules précèdent nous avions
 
-Dans l’exercice précèdent nous avons du définir un type TS `Todo` et autant de requêtes SQL que nécessaire.
+- Des Scripts SQL pour créer notre model de données
+- Notre code base
 
-```tsx
-type Todo = {
-  id: number
-  title: string
-  isCompleted: boolean
-  createdAt?: Date
-  updatedAt?: Date
-}
+S'assurer que tout est en phase peut être fastidieux et l’on est jamais à l’abris d’un oublie. Dans une application il y à gérer le développement de nouvelle `feature` mais aussi l’évolution.
 
-await pool.sql`
-    UPDATE Todo
-    SET
-      title = ${title},
-      isCompleted = ${isCompleted},
-      updatedAt = NOW()
-    WHERE id = ${id}
-  `
-```
+Comment gérer la suppression, l’ajout ou la modification d’une table, colonne, type ? Cela peut vite devenir compliqué.
 
-Le but d’un ORM est d’être indépendant de la BDD (en théorie) et de définir des models (qui correspondent à des tables) que l’on peut manipuler facilement dans le code.
+### Drizzle Kit
 
-Il existe de nombreux `ORM JS/TS` comme : Sequelize / TypeORM / Prisma / Objection.js / MikroORM etc …
+`Drizzle kit` est un utilitaire nous permettant plusieurs choses mais les plus importantes sont
 
-Dans ce module nous utiliserons `Drizzle` car il est très léger et simple à manipuler. Par exemple la définition d’un `User`
+- La génération du model de données
+
+En gros la conversion de notre code en script SQL
 
 ```tsx
-export const users = pgTable('users', {
-  id: serial('id').primaryKey(),
-  fullName: text('full_name'),
-  phone: varchar('phone', { length: 256 }),
+export const user = pgTable("user", {
+  id: serial("id"),
+  name: text("name"),
+  email: text("email"),
+  password: text("password"),
+  role: text("role").$type<"admin" | "customer">(),
+  createdAt: timestamp("created_at"),
+  updatedAt: timestamp("updated_at"),
 });
+// tranformer en ça
+CREATE TABLE IF NOT EXISTS "user" (
+  "id" serial,
+  "name" text,
+  "email" text,
+  "password" text,
+  "role" text,
+  "created_at" timestamp,
+  "updated_at" timestamp
+);
 ```
 
-Mise à jour
+- La gestion des migration
+
+C’est à dire les scripts permettant de passer d’une version à une autre
+
+Admettons l’ajout d’une colonne `isVerified: boolean("is_verified"),`
 
 ```tsx
-await db.update(users)
-  .set({ name: 'Mr. Dan' })
-  .where(eq(users.name, 'Dan'));
-```
-
-Nous n’avons plus besoin de gérer les requête SQL nativement. De plus cette approche permet également de manipuler le model de données et gérer les migrations.
-
-📑 Le liens vers la doc [https://orm.drizzle.team/docs/sql-schema-declaration](https://orm.drizzle.team/docs/sql-schema-declaration)
-
-### Initialiser Drizzle
-
-Pour initialiser initialiser Drizzle il faut plusieurs choses
-
-- Un client/pool de connexion
-- Des models
-- Des options
-
-Exemple avec Node-Postgres
-
-```tsx
-import { drizzle } from "drizzle-orm/node-postgres";
-import { Pool } from "pg";
-import * as user from './users'
-
-const pool = new Pool({
-  connectionString: "postgres://user:password@host:port/db",
+export const user = pgTable("user", {
+  id: serial("id"),
+  name: text("name"),
+  email: text("email"),
+  password: text("password"),
+  isVerified: boolean("is_verified"),
+  role: text("role").$type<"admin" | "customer">(),
+  createdAt: timestamp("created_at"),
+  updatedAt: timestamp("updated_at"),
 });
-
-const db = drizzle(pool, {
-  schema: {...user},
-});
+//generation
+ALTER TABLE "user" ADD COLUMN "is_verified" boolean;
 ```
 
-Exemple avec Vercel-Postgres
-
-```tsx
-import {createPool} from '@vercel/postgres'
-import {drizzle} from 'drizzle-orm/vercel-postgres'
-import * as user from './users'
-
-const pool = createPool({
-  connectionString: "postgres://user:password@host:port/db",
-})
-const db = drizzle(pool, {
-  schema: {...user},
-})
-```
-
-On peut ensuite utiliser `Drizzle` pour manipuler la BDD
-
-```tsx
-const result = await db.select().from(users)
-```
-
-**Organisation du projet**
-
-L’organisation du projet est libre mais nous suivrons une des recommandation de la [documentation](https://orm.drizzle.team/docs/sql-schema-declaration)
-
-![image.png](/course/folder.png)
-
-Pour simplifier l’exercice un fichier `src/db/schema.index.ts` contient les 2 configurations de base de données. Pour switcher de l’un à l'autre il suffit de modifier le `boolean isVercel true/false`
-
-- Vercel et PG
-
-```tsx
-const pool = new Pool({
-  connectionString: process.env.POSTGRES_URL_LOCAL,
-})
-const poolVercel = createPool({
-  connectionString: process.env.POSTGRES_URL,
-})
-
-const dbPg = drizzle(pool, {
-  schema: {...todos},
-})
-const dbVercel = drizzleVercel(poolVercel, {
-  schema: {...todos},
-})
-
-const isVercel = true
-const db = isVercel ? dbVercel : dbPg
-export default db
-```
+📑 Le liens vers la doc : [https://orm.drizzle.team/kit-docs/overview#overview](https://orm.drizzle.team/kit-docs/overview#overview)
 
 ## Exercice
 
-Dans cet exercice tu vas devoir modéliser `Todo` .Pour éviter les confusions nous avons rendu le type `Todo` précèdent `deprecated`.
+Dans cet exercice nous allons créer plusieurs scripts, la première chose est d’ajouter la dépendance vers `drizzle` kit
 
-```tsx
-/**
- * @deprecated Use type genereted by Drizzle Insted.
- */
-export type Todo = {
-  id: number
-  title: string
-  isCompleted: boolean
-  createdAt?: Date
-  updatedAt?: Date
-}
+```json
+//package.json
+"devDependencies": {
+    "drizzle-kit": "^0.24.0",
 ```
 
-**🐶 1. Edite le fichier** `src/db/schema/todos.ts` pour ajouter les colonnes et leurs types. Pour rappel voila le format de la création de la table
+Ensuite les scripts
 
-```tsx
-CREATE TABLE Todo (
+```json
+"db:generate": "drizzle-kit generate", //generation des scripts
+"db:migrate": "drizzle-kit migrate", //execution des scripts de migration
+"db:drop": "drizzle-kit drop", // supression d'un script de migration
+"db:reset-seed": "pnpm db:clear && pnpm db:generate && pnpm db:migrate && pnpm db:seed" // Tout renegenerer
+```
+
+**🐶** Pour que ces scripts fonctionnent tu vas creer un fichier de configuration drizzle
+
+Fichiers
+
+- `pacakge.json`
+- `drizzle.config.ts`
+
+## Bonus
+
+### 1. 🚀 Studio
+
+Essaye le studio (en beta)
+
+```json
+"db:studio": "drizzle-kit studio" // permet de lancer une interface legere
+```
+
+[Se connecter à l’interface](https://local.drizzle.studio/)
+
+Il est intéressant de voir que l’on peux :
+
+- Exécuter des requêtes `SQL`
+- Exécuter des requêtes `Drizzle`
+- Introspecter les tables dans l’onglet `shema`
+
+Créer une nouvelle table `TOTO` et constate l’introspection
+
+```sql
+CREATE TABLE TOTO (
   id SERIAL PRIMARY KEY,
   title VARCHAR(255) NOT NULL,
   isCompleted BOOLEAN NOT NULL,
@@ -161,62 +126,13 @@ CREATE TABLE Todo (
 );
 ```
 
-- Pour définir un clef primaire : https://orm.drizzle.team/docs/column-types/pg#primary-key
-- Pour définir un texte et un longeur : https://orm.drizzle.team/docs/column-types/pg#varchar
-- Pour définir un timestamp : https://orm.drizzle.team/docs/column-types/pg#timestamp
-
-Pense à :
-
-- mettre les valeurs par default
-- exporter les types TS `Todo` et `AddTodo` grâce a [$inferSelect et $inserInsert](https://orm.drizzle.team/learn/latest-releases/drizzle-orm-v0283#-added-tableinferselect--table_inferselect-and-tableinferinsert--table_inferinsert-for-more-convenient-table-model-type-inference)
-
-**🐶 2. Edite le fichier `action` pour la requête `getTodos`**
-
-- Nous allons utiliser [select](https://orm.drizzle.team/docs/select)
-- Nous allons trier par id : [orderBy](https://orm.drizzle.team/docs/select#order-by)
-
 Fichiers
 
-- `src/db/schema/todos.ts`
-- `src/exercises/drizzle-todo/action.ts`
-
-## Bonus
-
-### 1. 🚀 Insérer des données
-
-🐶 dans cet exercice tu vas devoir modifier la requête `insert` native en utilisant `drizzle`, exemple :
-
-```tsx
-await db.insert(users).values({ name: 'Andrew' });
-```
-
-📑 Le lien vers la doc : [https://orm.drizzle.team/docs/insert](https://orm.drizzle.team/docs/insert)
-
-PS : retourne la valeur inséré avec [returning()](https://orm.drizzle.team/docs/insert#insert-returning)
-
-Fichiers
-
-- `src/exercises/drizzle-todo/action.ts`
-
-### 2. 🚀 Mettre à jour les données
-
-🐶 dans cet exercice tu vas devoir modifier la requête `update` native en utilisant `drizzle`, exemple :
-
-```tsx
-await db.update(users)
-  .set({ name: 'Mr. Dan' })
-  .where(eq(users.name, 'Dan'));
-```
-
-📑 Le lien vers la doc : [https://orm.drizzle.team/docs/update](https://orm.drizzle.team/docs/update)
-
-Fichiers
-
-- `src/exercises/drizzle-todo/action.ts`
+- `package.json`
 
 ## Aller plus loin
 
-📑 Le lien vers la doc : [https://orm.drizzle.team/docs/](https://orm.drizzle.team/docs/update)
+📑 Le lien vers la doc [https://orm.drizzle.team/kit-docs/overview](https://orm.drizzle.team/kit-docs/overview)
 
 ## Ils vont t’aider
 
@@ -228,4 +144,4 @@ Fichiers
 
 ## 🐜 Feedback
 
-Remplir le formulaire le [formulaire de FeedBack](https://go.mikecodeur.com/cours-next-avis?entry.1912869708=Next%20PRO&entry.1430994900=Data%20Modeling&entry.533578441=04%20ORM%20Drizzle).
+Remplir le formulaire le [formulaire de FeedBack](https://go.mikecodeur.com/cours-next-avis?entry.1912869708=Next%20PRO&entry.1430994900=Data%20Modeling&entry.533578441=05%20Drizzle%20Kit).

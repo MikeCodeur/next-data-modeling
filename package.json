@@ -13,9 +13,12 @@
     "format:fix": "prettier . --write",
     "db:check": "tsx src/db/scripts/check.ts",
     "db:clear": "tsx src/db/scripts/clear.ts",
-    "db:push": "tsx src/db/scripts/create.ts",
     "db:seed": "tsx src/db/scripts/seed.ts",
-    "db:reset-seed": "pnpm db:clear && pnpm db:push && pnpm db:seed"
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:drop": "drizzle-kit drop",
+    "db:studio": "drizzle-kit studio",
+    "db:reset-seed": "pnpm db:drop && pnpm db:clear && pnpm db:generate && pnpm db:migrate && pnpm db:seed"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",
@@ -64,6 +67,7 @@
     "@typescript-eslint/eslint-plugin": "^7.18.0",
     "@typescript-eslint/parser": "^7.18.0",
     "autoprefixer": "^10.4.20",
+    "drizzle-kit": "^0.24.0",
     "eslint": "^8.57.0",
     "eslint-config-next": "14.2.1",
     "eslint-config-prettier": "^9.1.0",
