@@ -9,3 +9,13 @@ INSERT INTO Todo (title, isCompleted, createdAt, updatedAt) VALUES
 ('Practice Coding Challenges', false, '2024-01-08 17:00:00', '2024-01-08 17:00:00'),
 ('Network with Peers', false, '2024-01-09 13:00:00', '2024-01-09 13:00:00'),
 ('Plan Next Month’s Goals', true, '2024-01-10 18:00:00', '2024-01-10 18:00:00');
+
+-- Insérer des utilisateurs
+INSERT INTO users (name) VALUES
+('Alice'),
+('Bob'),
+('Blocked');
+
+INSERT INTO profile_info (user_id, note, metadata) VALUES
+((SELECT id FROM users WHERE name = 'Alice'),'Note Alice', '{"age": 25, "city": "New York"}'),
+((SELECT id FROM users WHERE name = 'Bob'), 'Note Bob', '{"age": 30, "city": "San Francisco"}');

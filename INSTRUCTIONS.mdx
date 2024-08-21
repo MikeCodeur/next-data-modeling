@@ -1,6 +1,6 @@
-# Drizzle KIT - Génération / Migration
+# Relation One To One
 
-### 💡 Utiliser Drizzle KIT
+### 💡 Comprendre les relations 1-1
 
 ## 📝 Tes notes
 
@@ -8,131 +8,109 @@ Detaille ce que tu as appris ici, sur une page [Notion](https://go.mikecodeu
 
 ## Comprendre
 
-Il est important d’avoir une codebase en phase avec la modélisation de notre base de données. Dans les modules précèdent nous avions
+Rappel
 
-- Des Scripts SQL pour créer notre model de données
-- Notre code base
+Voici un bref rappel des types de relations en bases de données relationnelles :
 
-S'assurer que tout est en phase peut être fastidieux et l’on est jamais à l’abris d’un oublie. Dans une application il y à gérer le développement de nouvelle `feature` mais aussi l’évolution.
+### 1. Relation **1-1** (One-to-One)
 
-Comment gérer la suppression, l’ajout ou la modification d’une table, colonne, type ? Cela peut vite devenir compliqué.
+- **Description** : Chaque enregistrement dans une table A correspond à un seul enregistrement dans une table B, et vice versa.
+- **Exemple** : Un utilisateur (`users`) et son profil détaillé (`user_profiles`). Chaque utilisateur a un profil unique.
+- **Implémentation** : Utilisation d'une clé étrangère (foreign key) avec une contrainte d'unicité (`UNIQUE`) dans l'une des tables.
 
-### Drizzle Kit
+### 2. Relation **1-N** (One-to-Many)
 
-`Drizzle kit` est un utilitaire nous permettant plusieurs choses mais les plus importantes sont
+- **Description** : Un enregistrement dans la table A peut être associé à plusieurs enregistrements dans la table B, mais chaque enregistrement dans la table B est lié à un seul enregistrement dans la table A.
+- **Exemple** : Un auteur (`authors`) et ses livres (`books`). Un auteur peut avoir plusieurs livres, mais chaque livre a un seul auteur.
+- **Implémentation** : La table B contient une clé étrangère qui pointe vers la clé primaire de la table A.
 
-- La génération du model de données
+### 3. Relation **N-N** (Many-to-Many)
 
-En gros la conversion de notre code en script SQL
+- **Description** : Un enregistrement dans la table A peut être associé à plusieurs enregistrements dans la table B, et vice versa.
+- **Exemple** : Les étudiants (`students`) et les cours (`courses`). Un étudiant peut suivre plusieurs cours, et un cours peut être suivi par plusieurs étudiants.
+- **Implémentation** : Création d'une table de jonction (ou d'association) avec deux clés étrangères, une pointant vers la table A et l'autre vers la table B.
 
-```tsx
-export const user = pgTable("user", {
-  id: serial("id"),
-  name: text("name"),
-  email: text("email"),
-  password: text("password"),
-  role: text("role").$type<"admin" | "customer">(),
-  createdAt: timestamp("created_at"),
-  updatedAt: timestamp("updated_at"),
-});
-// tranformer en ça
-CREATE TABLE IF NOT EXISTS "user" (
-  "id" serial,
-  "name" text,
-  "email" text,
-  "password" text,
-  "role" text,
-  "created_at" timestamp,
-  "updated_at" timestamp
+Pour créer des relation en SQL il faut plusieurs tables contenant chacune une `PK (Primary Key)`. La liaison se fait via un clef étrangère, `FK (Foreign Key)`. On utilise `REFERENCES` pour définir la FK. Exemple :
+
+```sql
+CREATE TABLE users (
+    id serial PRIMARY KEY,
+    name text NOT NULL
+);
+
+CREATE TABLE orders (
+    id serial PRIMARY KEY,
+    user_id integer NOT NULL,
+    order_date date NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id)
 );
 ```
 
-- La gestion des migration
+### Drizzle : relation / références
 
-C’est à dire les scripts permettant de passer d’une version à une autre
+Pour définir des relations avec `Drizzle` nous avons besoin de 2 choses :
 
-Admettons l’ajout d’une colonne `isVerified: boolean("is_verified"),`
+- Définir les FK (avec `references`), cela applique les contraintes sur la BDD
+  - Doc : https://orm.drizzle.team/docs/rqb#foreign-keys
+- Définir les Relation (Au niveau applicatif avec `relation`)
+  - Doc : https://orm.drizzle.team/docs/rqb#one-to-one
+
+Exemple de définition de relation 1-1
 
 ```tsx
-export const user = pgTable("user", {
-  id: serial("id"),
-  name: text("name"),
-  email: text("email"),
-  password: text("password"),
-  isVerified: boolean("is_verified"),
-  role: text("role").$type<"admin" | "customer">(),
-  createdAt: timestamp("created_at"),
-  updatedAt: timestamp("updated_at"),
+import { pgTable, serial, text, integer, boolean } from 'drizzle-orm/pg-core';
+import { relations } from 'drizzle-orm';
+
+//table 1
+export const users = pgTable('users', {
+  id: serial('id').primaryKey(),
+  name: text('name'),
 });
-//generation
-ALTER TABLE "user" ADD COLUMN "is_verified" boolean;
+//table 2
+export const profileInfo = pgTable('profile_info', {
+  id: serial('id').primaryKey(),
+  userId: integer("user_id").references(() => users.id), // FK
+  metadata: jsonb("metadata"),
+});
+//RELATION
+export const usersRelations = relations(users, ({ one, many }) => ({
+  profileInfo: one(users, {
+    fields: [profileInfo.userId],
+    references: [users.id],
+  }),
+}));
+
 ```
 
-📑 Le liens vers la doc : [https://orm.drizzle.team/kit-docs/overview#overview](https://orm.drizzle.team/kit-docs/overview#overview)
+📑 Le liens vers la doc [https://fr.reactjs.org/docs/getting-started.html](https://fr.reactjs.org/docs/getting-started.html)
+
+Des frameworks JavaScript modernes ont donc été créés pour relever certains des défis en créant par programme le DOM plutôt que de le définir à la main HTML.
 
 ## Exercice
 
-Dans cet exercice nous allons créer plusieurs scripts, la première chose est d’ajouter la dépendance vers `drizzle` kit
-
-```json
-//package.json
-"devDependencies": {
-    "drizzle-kit": "^0.24.0",
-```
-
-Ensuite les scripts
-
-```json
-"db:generate": "drizzle-kit generate", //generation des scripts
-"db:migrate": "drizzle-kit migrate", //execution des scripts de migration
-"db:drop": "drizzle-kit drop", // supression d'un script de migration
-"db:reset-seed": "pnpm db:clear && pnpm db:generate && pnpm db:migrate && pnpm db:seed" // Tout renegenerer
-```
-
-**🐶** Pour que ces scripts fonctionnent tu vas creer un fichier de configuration drizzle
+**🐶D**ans cet exercice tu vas devoir créer une relation 1-1 entre `USER` et `PROFILEINFO`
 
 Fichiers
 
-- `pacakge.json`
-- `drizzle.config.ts`
+- `src/db/schema/user.ts`
 
 ## Bonus
 
-### 1. 🚀 Studio
+### 1. 🚀 Query
 
-Essaye le studio (en beta)
+La puissance de l’ORM réside également dans le fait que lorsque l’on définis correctement les relations, il est très simple d’accéder aux données ainsi que les données associé au lieu d’avoir a faire plusieurs requêtes SQL séparés ou une grosse requêtes complexe avec des jointures.
 
-```json
-"db:studio": "drizzle-kit studio" // permet de lancer une interface legere
-```
+**🐶** Dans cet exercice tu vas appeler `USER` et demander d’avoir le profil avec pour afficher la note
 
-[Se connecter à l’interface](https://local.drizzle.studio/)
-
-Il est intéressant de voir que l’on peux :
-
-- Exécuter des requêtes `SQL`
-- Exécuter des requêtes `Drizzle`
-- Introspecter les tables dans l’onglet `shema`
-
-Créer une nouvelle table `TOTO` et constate l’introspection
-
-```sql
-CREATE TABLE TOTO (
-  id SERIAL PRIMARY KEY,
-  title VARCHAR(255) NOT NULL,
-  isCompleted BOOLEAN NOT NULL,
-  createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-```
+📑 Le lien vers la doc [https://orm.drizzle.team/docs/rqb](https://orm.drizzle.team/docs/rqb)
 
 Fichiers
 
-- `package.json`
+- `exercise/relation-one/page`
 
 ## Aller plus loin
 
-📑 Le lien vers la doc [https://orm.drizzle.team/kit-docs/overview](https://orm.drizzle.team/kit-docs/overview)
+📑 Le lien vers la doc [https://orm.drizzle.team/docs/rqb](https://orm.drizzle.team/docs/rqb)
 
 ## Ils vont t’aider
 
@@ -144,4 +122,4 @@ Fichiers
 
 ## 🐜 Feedback
 
-Remplir le formulaire le [formulaire de FeedBack](https://go.mikecodeur.com/cours-next-avis?entry.1912869708=Next%20PRO&entry.1430994900=Data%20Modeling&entry.533578441=05%20Drizzle%20Kit).
+Remplir le formulaire le [formulaire de FeedBack](https://go.mikecodeur.com/cours-next-avis?entry.1912869708=Next%20PRO&entry.1430994900=Data%20Modeling&entry.533578441=06%20Relation%201-1).

@@ -49,6 +49,12 @@ export default function AppLayout({children}: PropsWithChildren) {
               >
                 <span>Drizzle Todo</span>
               </Link>
+              <Link
+                className="flex items-center space-x-2 font-bold"
+                href="/exercises/relations-one"
+              >
+                <span>One To One</span>
+              </Link>
 
               <div className="hidden items-center space-x-2 md:flex"></div>
             </div>

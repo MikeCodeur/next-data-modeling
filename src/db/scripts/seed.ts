@@ -35,6 +35,18 @@ const seed = async () => {
 
     `)
 
+  await client.query(` 
+      INSERT INTO users (name) VALUES
+      ('Alice'),
+      ('Bob'),
+      ('Blocked');
+
+      INSERT INTO profile_info (user_id, note, metadata) VALUES
+((SELECT id FROM users WHERE name = 'Alice'),'Note Alice', '{"age": 25, "city": "New York"}'),
+((SELECT id FROM users WHERE name = 'Bob'), 'Note Bob', '{"age": 30, "city": "San Francisco"}');
+    
+        `)
+
   const end = Date.now()
 
   console.log('✅ Connexion checked in', end - start, 'ms')
