@@ -43,6 +43,12 @@ export default function AppLayout({children}: PropsWithChildren) {
               >
                 <span>Native SQL</span>
               </Link>
+              <Link
+                className="flex items-center space-x-2 font-bold"
+                href="/exercises/drizzle-todo"
+              >
+                <span>Drizzle Todo</span>
+              </Link>
 
               <div className="hidden items-center space-x-2 md:flex"></div>
             </div>

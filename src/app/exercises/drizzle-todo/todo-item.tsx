@@ -1,10 +1,10 @@
 'use client'
 import {Checkbox} from '@/components/ui/checkbox'
 import {cn} from '@/lib/utils'
-import {Todo} from '@/lib/type'
 import {updateTodo as updateTodoAction} from './actions'
 import {toast} from 'sonner'
 import {startTransition, useOptimistic} from 'react'
+import {Todo} from '@/db/schema/todos.final'
 
 type TodoOptimistic = Todo & {
   sending?: boolean
@@ -35,7 +35,7 @@ export default function TodoItem({todo}: {todo: Todo}) {
     <>
       <div className="flex items-center gap-4" key={optimisticTodo.id}>
         <Checkbox
-          checked={optimisticTodo.isCompleted}
+          checked={optimisticTodo.isCompleted ?? false}
           id={`${optimisticTodo.id}`}
           onCheckedChange={(checked) =>
             startTransition(() => handleChange(checked as boolean))
@@ -56,10 +56,7 @@ export default function TodoItem({todo}: {todo: Todo}) {
             'line-through': optimisticTodo.isCompleted,
           })}
         >
-          {/* Type switch randomly ? */}
-          {optimisticTodo.updatedAt instanceof Date
-            ? optimisticTodo.updatedAt.toDateString()
-            : optimisticTodo.updatedAt}
+          {optimisticTodo.updatedAt?.toDateString()}
         </span>
       </div>
     </>

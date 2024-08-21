@@ -14,6 +14,9 @@ export type Product = {
   updatedAt?: string
 }
 
+/**
+ * @deprecated Use type genereted by Drizzle Insted.
+ */
 export type Todo = {
   id: number
   title: string
@@ -37,6 +40,9 @@ export type User = {
   role: RoleEnum
 }
 export type AddUser = Partial<Pick<User, 'id'>> & Omit<User, 'id'>
+/**
+ * @deprecated Use type genereted by Drizzle Insted.
+ */
 export type AddTodo = Partial<Pick<Todo, 'id'>> & Omit<Todo, 'id'>
 export enum CategoriesEnum {
   default = 'default',

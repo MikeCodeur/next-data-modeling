@@ -25,7 +25,8 @@
     "json-format",
     "unicorn",
     "promise",
-    "prettier"
+    "prettier",
+    "deprecation"
   ],
   "rules": {
     "prettier/prettier": "error",
@@ -52,7 +53,9 @@
     "promise/avoid-new": "off",
     "react/prop-types": "off",
     "no-shadow": "off",
-    "@typescript-eslint/no-shadow": "error"
+    "@typescript-eslint/no-shadow": "error",
+    "eslint-comments/no-use": "warn",
+    "deprecation/deprecation": "warn"
   },
   "ignorePatterns": ["src/**/*.js"]
 }
