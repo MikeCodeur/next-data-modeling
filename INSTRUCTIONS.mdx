@@ -1,6 +1,6 @@
-# Relation One To One
+# Relation One To Many
 
-### 💡 Comprendre les relations 1-1
+### 💡 Description longue de l'exercice
 
 ## 📝 Tes notes
 
@@ -8,109 +8,143 @@ Detaille ce que tu as appris ici, sur une page [Notion](https://go.mikecodeu
 
 ## Comprendre
 
-Rappel
+Les relations 1-N (One to Many) sont le le type de relation le plus répandu. Ces par exemple
 
-Voici un bref rappel des types de relations en bases de données relationnelles :
+- 1 Panier —> contient N produits
+- 1 User —> possède N posts
 
-### 1. Relation **1-1** (One-to-One)
+Dans l’autre sens
 
-- **Description** : Chaque enregistrement dans une table A correspond à un seul enregistrement dans une table B, et vice versa.
-- **Exemple** : Un utilisateur (`users`) et son profil détaillé (`user_profiles`). Chaque utilisateur a un profil unique.
-- **Implémentation** : Utilisation d'une clé étrangère (foreign key) avec une contrainte d'unicité (`UNIQUE`) dans l'une des tables.
+- 1 Produit —> appartient à 1 Panier
+- 1 Post—> appartient à 1 User
 
-### 2. Relation **1-N** (One-to-Many)
-
-- **Description** : Un enregistrement dans la table A peut être associé à plusieurs enregistrements dans la table B, mais chaque enregistrement dans la table B est lié à un seul enregistrement dans la table A.
-- **Exemple** : Un auteur (`authors`) et ses livres (`books`). Un auteur peut avoir plusieurs livres, mais chaque livre a un seul auteur.
-- **Implémentation** : La table B contient une clé étrangère qui pointe vers la clé primaire de la table A.
-
-### 3. Relation **N-N** (Many-to-Many)
-
-- **Description** : Un enregistrement dans la table A peut être associé à plusieurs enregistrements dans la table B, et vice versa.
-- **Exemple** : Les étudiants (`students`) et les cours (`courses`). Un étudiant peut suivre plusieurs cours, et un cours peut être suivi par plusieurs étudiants.
-- **Implémentation** : Création d'une table de jonction (ou d'association) avec deux clés étrangères, une pointant vers la table A et l'autre vers la table B.
-
-Pour créer des relation en SQL il faut plusieurs tables contenant chacune une `PK (Primary Key)`. La liaison se fait via un clef étrangère, `FK (Foreign Key)`. On utilise `REFERENCES` pour définir la FK. Exemple :
-
-```sql
-CREATE TABLE users (
-    id serial PRIMARY KEY,
-    name text NOT NULL
-);
-
-CREATE TABLE orders (
-    id serial PRIMARY KEY,
-    user_id integer NOT NULL,
-    order_date date NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES users(id)
-);
-```
-
-### Drizzle : relation / références
-
-Pour définir des relations avec `Drizzle` nous avons besoin de 2 choses :
-
-- Définir les FK (avec `references`), cela applique les contraintes sur la BDD
-  - Doc : https://orm.drizzle.team/docs/rqb#foreign-keys
-- Définir les Relation (Au niveau applicatif avec `relation`)
-  - Doc : https://orm.drizzle.team/docs/rqb#one-to-one
-
-Exemple de définition de relation 1-1
+Pour définir ce type de relation avec `Drizzle` il faut définir la relation dans les deux sens. Exemple
 
 ```tsx
-import { pgTable, serial, text, integer, boolean } from 'drizzle-orm/pg-core';
-import { relations } from 'drizzle-orm';
 
-//table 1
 export const users = pgTable('users', {
   id: serial('id').primaryKey(),
   name: text('name'),
 });
-//table 2
-export const profileInfo = pgTable('profile_info', {
+
+export const posts = pgTable('posts', {
   id: serial('id').primaryKey(),
-  userId: integer("user_id").references(() => users.id), // FK
-  metadata: jsonb("metadata"),
+  content: text('content'),
+  authorId: integer('author_id'),
 });
-//RELATION
-export const usersRelations = relations(users, ({ one, many }) => ({
-  profileInfo: one(users, {
-    fields: [profileInfo.userId],
+
+// avec 'one'
+// 1 Post appartients à un user ('one')
+export const postsRelations = relations(posts, ({ one }) => ({
+  author: one(users, {
+    fields: [posts.authorId],
     references: [users.id],
   }),
 }));
-
+// avec 'many'
+// 1 User possède plusieurs posts ('many')
+export const usersRelations = relations(users, ({ many }) => ({
+  posts: many(posts),
+}));
 ```
 
-📑 Le liens vers la doc [https://fr.reactjs.org/docs/getting-started.html](https://fr.reactjs.org/docs/getting-started.html)
+Il est ensuite possible de récupérer “automatiquement” les relations liés avec `with` : exemple
 
-Des frameworks JavaScript modernes ont donc été créés pour relever certains des défis en créant par programme le DOM plutôt que de le définir à la main HTML.
+```tsx
+const result = await db.query.users.findFirst({
+  with: {
+    posts: true
+  },
+});
+// va retourner le premier utilisateur trouvé avec tout ses posts associés
+// output result :
+[{
+  id: 1,
+  name: "Dan",
+  posts: [
+    {
+      id: 1,
+      content: "SQL is awesome",
+      authorId: 1,
+    },
+    {
+      id: 2,
+      content: "But check relational queries",
+      authorId: 1,
+    }
+  ]
+}]
+```
 
 ## Exercice
 
-**🐶D**ans cet exercice tu vas devoir créer une relation 1-1 entre `USER` et `PROFILEINFO`
+Dans cet exercice nous avons repris nos `Products` et `Categories` et nous les avons ajouté a `Drizzle`
+
+```tsx
+// src/db/schema/...
+export const categories = pgTable('category', {
+  id: serial('id').primaryKey(),
+  name: text('name'),
+})
+
+export const products = pgTable('product', {
+  id: serial('id').primaryKey(),
+  title: varchar('title', {length: 256}),
+  price: real('price'),
+  description: text('description'),
+  image: varchar('image', {length: 256}),
+  category: integer('category_id'),
+  quantity: integer('quantity'),
+  createdAt: date('createdat'),
+  updatedAt: date('updatedat'),
+})
+```
+
+```tsx
+// src/db/schema/index.ts
+
+const db = drizzle(pool, {
+  schema: {...todos, ...users, ...categories, ...products},
+})
+```
+
+**🐶 1. Créer la relation `1 to many` dans les shemas**
+
+**🐶 2. Adapte la requête `getCategoriesByIdWithProducts`**
+
+Constate pour que chaque catégorie nous avons bien plusieurs produits
 
 Fichiers
 
-- `src/db/schema/user.ts`
+- `src/db/products`
+- `src/db/categories`
+- `exercises/one-many/actions`
 
 ## Bonus
 
-### 1. 🚀 Query
+### 1. 🚀 Imbrication
 
-La puissance de l’ORM réside également dans le fait que lorsque l’on définis correctement les relations, il est très simple d’accéder aux données ainsi que les données associé au lieu d’avoir a faire plusieurs requêtes SQL séparés ou une grosse requêtes complexe avec des jointures.
+Dans chaque catégorie nous avons les produits. Le champs `product.category` contient l’id de la catégorie. Or à l’écran nous voulons le nom et nom l’id. Nous voulons donc charger également la relation.
 
-**🐶** Dans cet exercice tu vas appeler `USER` et demander d’avoir le profil avec pour afficher la note
+**🐶 Dans cet utilise `with` à l’intérieur du premier `with` pour récupérer les noms de catégories**
 
-📑 Le lien vers la doc [https://orm.drizzle.team/docs/rqb](https://orm.drizzle.team/docs/rqb)
+```tsx
+with: {
+    products: {
+      with: ... //imbrication
+    },
+  },
+```
 
 Fichiers
 
-- `exercise/relation-one/page`
+- `exercises/one-many/actions`
+
+###
 
 ## Aller plus loin
 
-📑 Le lien vers la doc [https://orm.drizzle.team/docs/rqb](https://orm.drizzle.team/docs/rqb)
+📑 Le lien vers la doc [https://www.w3schools.com/html/html_css.asp](https://www.w3schools.com/html/html_css.asp)
 
 ## Ils vont t’aider
 
@@ -122,4 +156,4 @@ Fichiers
 
 ## 🐜 Feedback
 
-Remplir le formulaire le [formulaire de FeedBack](https://go.mikecodeur.com/cours-next-avis?entry.1912869708=Next%20PRO&entry.1430994900=Data%20Modeling&entry.533578441=06%20Relation%201-1).
+Remplir le formulaire le [formulaire de FeedBack](https://go.mikecodeur.com/cours-next-avis?entry.1912869708=Next%20PRO&entry.1430994900=Data%20Modeling&entry.533578441=07%20One%20to%20many).

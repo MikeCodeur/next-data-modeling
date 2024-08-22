@@ -2,6 +2,9 @@ export type Post = {
   id?: string
   title: string
 }
+/**
+ * @deprecated Use type genereted by Drizzle Insted.
+ */
 export type Product = {
   id: string
   title: string

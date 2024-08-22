@@ -5,6 +5,8 @@ import {drizzle as drizzleVercel} from 'drizzle-orm/vercel-postgres'
 
 import * as todos from './todos'
 import * as users from './users'
+import * as categories from './categories'
+import * as products from './products'
 
 const pool = new Pool({
   connectionString: process.env.POSTGRES_URL_LOCAL,
@@ -14,10 +16,10 @@ const poolVercel = createPool({
 })
 
 const dbPg = drizzle(pool, {
-  schema: {...todos, ...users},
+  schema: {...todos, ...users, ...categories, ...products},
 })
 const dbVercel = drizzleVercel(poolVercel, {
-  schema: {...todos, ...users},
+  schema: {...todos, ...users, ...categories, ...products},
 })
 
 const isVercel = true
