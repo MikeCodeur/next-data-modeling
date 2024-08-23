@@ -61,6 +61,12 @@ export default function AppLayout({children}: PropsWithChildren) {
               >
                 <span>One To Many</span>
               </Link>
+              <Link
+                className="flex items-center space-x-2 font-bold"
+                href="/exercises/many-many"
+              >
+                <span>Many To Many</span>
+              </Link>
 
               <div className="hidden items-center space-x-2 md:flex"></div>
             </div>

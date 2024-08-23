@@ -14,7 +14,12 @@ INSERT INTO Todo (title, isCompleted, createdAt, updatedAt) VALUES
 INSERT INTO users (name) VALUES
 ('Alice'),
 ('Bob'),
-('Blocked');
+('Blocked'),
+('Charlie'),
+('David'),
+('Eve'),
+('Frank'),
+('Grace');
 
 INSERT INTO profile_info (user_id, note, metadata) VALUES
 ((SELECT id FROM users WHERE name = 'Alice'),'Note Alice', '{"age": 25, "city": "New York"}'),
@@ -38,3 +43,42 @@ INSERT INTO Product (title, price, description, image, category_id, quantity, cr
 ('Product 8', 89.99, 'Description for Product 8', 'image8.png', 4, 80, '2024-01-08 17:00:00', '2024-01-08 17:00:00'),
 ('Product 9', 99.99, 'Description for Product 9', 'image9.png', 5, 90, '2024-01-09 18:00:00', '2024-01-09 18:00:00'),
 ('Product 10', 109.99, 'Description for Product 10', 'image10.png', 5, 100, '2024-01-10 19:00:00', '2024-01-10 19:00:00');
+
+
+INSERT INTO groups (name) VALUES
+('Admin'),
+('User'),
+('Guest');
+
+-- Établir les relations entre les utilisateurs et les groupes
+-- Relations pour Alice
+INSERT INTO users_to_groups (user_id, group_id) VALUES
+((SELECT id FROM users WHERE name = 'Alice'), (SELECT id FROM groups WHERE name = 'Admin')),
+((SELECT id FROM users WHERE name = 'Alice'), (SELECT id FROM groups WHERE name = 'User'));
+
+-- Relations pour Bob
+INSERT INTO users_to_groups (user_id, group_id) VALUES
+((SELECT id FROM users WHERE name = 'Bob'), (SELECT id FROM groups WHERE name = 'User'));
+
+-- Relations pour Charlie
+INSERT INTO users_to_groups (user_id, group_id) VALUES
+((SELECT id FROM users WHERE name = 'Charlie'), (SELECT id FROM groups WHERE name = 'User')),
+((SELECT id FROM users WHERE name = 'Charlie'), (SELECT id FROM groups WHERE name = 'Guest'));
+
+-- Relations pour David
+INSERT INTO users_to_groups (user_id, group_id) VALUES
+((SELECT id FROM users WHERE name = 'David'), (SELECT id FROM groups WHERE name = 'User')),
+((SELECT id FROM users WHERE name = 'David'), (SELECT id FROM groups WHERE name = 'Admin'));
+
+-- Relations pour Eve
+INSERT INTO users_to_groups (user_id, group_id) VALUES
+((SELECT id FROM users WHERE name = 'Eve'), (SELECT id FROM groups WHERE name = 'Guest'));
+
+-- Relations pour Frank
+INSERT INTO users_to_groups (user_id, group_id) VALUES
+((SELECT id FROM users WHERE name = 'Frank'), (SELECT id FROM groups WHERE name = 'Admin'));
+
+-- Relations pour Grace
+INSERT INTO users_to_groups (user_id, group_id) VALUES
+((SELECT id FROM users WHERE name = 'Grace'), (SELECT id FROM groups WHERE name = 'User')),
+((SELECT id FROM users WHERE name = 'Grace'), (SELECT id FROM groups WHERE name = 'Guest'));

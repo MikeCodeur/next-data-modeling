@@ -1,4 +1,4 @@
-import {ProductWithCategory} from '@/db/schema/products.final'
+import {ProductWithCategory} from '@/db/schema/products'
 import {getCategoriesByIdWithProducts} from '../actions'
 import {ProductsTable} from './product-table'
 

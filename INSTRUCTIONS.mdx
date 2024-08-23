@@ -1,6 +1,6 @@
-# Relation One To Many
+# Relation Many To Many
 
-### 💡 Description longue de l'exercice
+### 💡 Comprendre les relations Many To Many
 
 ## 📝 Tes notes
 
@@ -8,143 +8,239 @@ Detaille ce que tu as appris ici, sur une page [Notion](https://go.mikecodeu
 
 ## Comprendre
 
-Les relations 1-N (One to Many) sont le le type de relation le plus répandu. Ces par exemple
+Rappel :
 
-- 1 Panier —> contient N produits
-- 1 User —> possède N posts
+Relation **N-N** (Many-to-Many)
 
-Dans l’autre sens
+- **Description** : Un enregistrement dans la table A peut être associé à plusieurs enregistrements dans la table B, et vice versa.
+- **Exemple** : Les étudiants (`students`) et les cours (`courses`). Un étudiant peut suivre plusieurs cours, et un cours peut être suivi par plusieurs étudiants.
+- **Implémentation** : Création d'une table de jonction (ou d'association) avec deux clés étrangères, une pointant vers la table A et l'autre vers la table B.
 
-- 1 Produit —> appartient à 1 Panier
-- 1 Post—> appartient à 1 User
+Exemple en SQL
 
-Pour définir ce type de relation avec `Drizzle` il faut définir la relation dans les deux sens. Exemple
+```sql
+CREATE TABLE students (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    enrollment_date DATE NOT NULL
+);
+
+CREATE TABLE courses (
+    id SERIAL PRIMARY KEY,
+    course_name VARCHAR(255) NOT NULL,
+    course_code VARCHAR(100) UNIQUE NOT NULL,
+    credits INT NOT NULL
+);
+```
+
+Table de jonction
+
+```sql
+CREATE TABLE student_courses (
+    student_id INT NOT NULL,
+    course_id INT NOT NULL,
+    PRIMARY KEY (student_id, course_id),
+    FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE,
+    FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE
+);
+// NOTE : La PK est une composition des 2 FK
+```
+
+De cette manière on peut dire :
+
+- 1 `Student` possède N `Course`
+- 1 `Course` Appartient à N `studient`
+
+**Avec Drizzle**
 
 ```tsx
 
-export const users = pgTable('users', {
-  id: serial('id').primaryKey(),
-  name: text('name'),
+export const students = pgTable("students", {
+    id: serial("id").primaryKey(),
+    name: varchar("name", { length: 255 }).notNull(),
+    email: varchar("email", { length: 255 }).notNull().unique(),
+    enrollment_date: date("enrollment_date").notNull(),
 });
 
-export const posts = pgTable('posts', {
-  id: serial('id').primaryKey(),
-  content: text('content'),
-  authorId: integer('author_id'),
+export const courses = pgTable("courses", {
+    id: serial("id").primaryKey(),
+    course_name: varchar("course_name", { length: 255 }).notNull(),
+    course_code: varchar("course_code", { length: 100 }).notNull().unique(),
+    credits: integer("credits").notNull(),
 });
 
-// avec 'one'
-// 1 Post appartients à un user ('one')
-export const postsRelations = relations(posts, ({ one }) => ({
-  author: one(users, {
-    fields: [posts.authorId],
-    references: [users.id],
+export const studentCourses = pgTable("student_courses", {
+    student_id: integer("student_id").notNull().references(() => students.id),
+    course_id: integer("course_id").notNull().references(() => courses.id),
+},
+(table) => ({
+    pk: primaryKey(table.student_id, table.course_id)
+}));
+
+// RELATION
+export const studentCoursesRelations = relations(studentCourses, ({ one }) => ({
+  student: one(students, {
+    fields: [studentCourses.student_id],
+    references: [students.id],
+  }),
+  course: one(courses, {
+    fields: [studentCourses.course_id],
+    references: [courses.id],
   }),
 }));
-// avec 'many'
-// 1 User possède plusieurs posts ('many')
-export const usersRelations = relations(users, ({ many }) => ({
-  posts: many(posts),
+// Optionnel : Relations inversées pour `students` et `courses`
+export const studentsRelations = relations(students, ({ many }) => ({
+  courses: many(studentCourses, {
+    fields: [studentCourses.student_id],
+    references: [students.id],
+  }),
+}));
+
+export const coursesRelations = relations(courses, ({ many }) => ({
+  students: many(studentCourses, {
+    fields: [studentCourses.course_id],
+    references: [courses.id],
+  }),
 }));
 ```
 
-Il est ensuite possible de récupérer “automatiquement” les relations liés avec `with` : exemple
+📑 Le liens vers la doc [https://orm.drizzle.team/docs/rqb#many-to-many](https://orm.drizzle.team/docs/rqb#many-to-many)
 
-```tsx
-const result = await db.query.users.findFirst({
-  with: {
-    posts: true
-  },
-});
-// va retourner le premier utilisateur trouvé avec tout ses posts associés
-// output result :
-[{
-  id: 1,
-  name: "Dan",
-  posts: [
-    {
-      id: 1,
-      content: "SQL is awesome",
-      authorId: 1,
-    },
-    {
-      id: 2,
-      content: "But check relational queries",
-      authorId: 1,
-    }
-  ]
-}]
-```
+Des frameworks JavaScript modernes ont donc été créés pour relever certains des défis en créant par programme le DOM plutôt que de le définir à la main HTML.
 
 ## Exercice
 
-Dans cet exercice nous avons repris nos `Products` et `Categories` et nous les avons ajouté a `Drizzle`
+Dans cet exercice nous allons modéliser des groupes utilisateurs tel que
 
-```tsx
-// src/db/schema/...
-export const categories = pgTable('category', {
-  id: serial('id').primaryKey(),
-  name: text('name'),
-})
+- 1 `Utilisateur` peut avoir plusieurs `Groupes`
+- 1 `Groupe` peut avoir plusieurs `Utilisateur`
 
-export const products = pgTable('product', {
-  id: serial('id').primaryKey(),
-  title: varchar('title', {length: 256}),
-  price: real('price'),
-  description: text('description'),
-  image: varchar('image', {length: 256}),
-  category: integer('category_id'),
-  quantity: integer('quantity'),
-  createdAt: date('createdat'),
-  updatedAt: date('updatedat'),
-})
-```
+Il s’agit d’un relation `many` to `many`
 
-```tsx
-// src/db/schema/index.ts
+**🐶 Dans un premier temps tu vas devoir modéliser les groupes dans `users`**
 
-const db = drizzle(pool, {
-  schema: {...todos, ...users, ...categories, ...products},
-})
-```
+- fichier `src/db/schema/users`
 
-**🐶 1. Créer la relation `1 to many` dans les shemas**
+Tu vas devoir créer
 
-**🐶 2. Adapte la requête `getCategoriesByIdWithProducts`**
+- la table `groups`
+- la table de relation `users_to_groups` avec comme PK le combinaison de 2 FK
 
-Constate pour que chaque catégorie nous avons bien plusieurs produits
+📑 Doc composite PK [https://orm.drizzle.team/docs/indexes-constraints#composite-primary-key](https://orm.drizzle.team/docs/indexes-constraints#composite-primary-key)
+
+- la relation `groupsRelations` (many)
+- la relation `usersToGroupsRelations` (one)
+
+**🐶 Dans un second temps tu vas devoir faire les `Queries`**
+
+- `getUsersWithGroups` : Les users avec leurs groupes
+- `getGroupsWithUsers` : Les groupes avec leurs users
 
 Fichiers
 
-- `src/db/products`
-- `src/db/categories`
-- `exercises/one-many/actions`
+- `src/db/schema/users`
+- `exercises/many-many/actions`
 
 ## Bonus
 
-### 1. 🚀 Imbrication
+### 1. 🚀 getGroupsWithUsersFilter
 
-Dans chaque catégorie nous avons les produits. Le champs `product.category` contient l’id de la catégorie. Or à l’écran nous voulons le nom et nom l’id. Nous voulons donc charger également la relation.
+- **🐶 Dans cet exercice tu vas devoir filtrer par nom de groupe**
 
-**🐶 Dans cet utilise `with` à l’intérieur du premier `with` pour récupérer les noms de catégories**
+Fait une recherche et récupère le groupe en fonction de son nom
+
+```tsx
+export async function getGroupsWithUsersFilter(groupName: string) {
+...
+
+where: (groups, {eq}) => eq(groups.name, groupName),
+```
+
+Utilise `with` de plusieurs niveau pour pouvoir avoir tous les autres groupes des `users` de ce groupe
 
 ```tsx
 with: {
-    products: {
-      with: ... //imbrication
-    },
-  },
+      usersToGroups: { ...
 ```
 
 Fichiers
 
-- `exercises/one-many/actions`
+- `exercises/many-many/actions`
 
-###
+### 2. 🚀 Relation inverse direct
+
+Manipuler la table de jonction peut etre plus compliquer et moins claire dans le code. Par exemple on utilise `user?.usersToGroups` pour récupérer les groupes dans un cas
+
+```tsx
+//recuperation des groupes
+{user?.usersToGroups?.map((usersToGroup, index) => (
+  <Badge key={index} variant="secondary">
+      {usersToGroup.group.name}
+  </Badge>
+))}
+```
+
+Et pour récupérer les user : `group?.usersToGroups`
+
+```tsx
+{group?.usersToGroups?.map((usersToGroup, index) => (
+      <Badge key={index} variant="secondary">
+        {usersToGroup.user.name}
+      </Badge>
+    ))}
+```
+
+Pour simplifier cela il suffit de spécifier la relation inverse exemple `usersRelations`
+
+```tsx
+// ajout de
+// groups: many(usersToGroups),
+export const usersRelations = relations(users, ({one, many}) => ({
+  profileInfo: one(profileInfo, {
+    fields: [users.id],
+    references: [profileInfo.userId],
+  }),
+  usersToGroups: many(usersToGroups),
+  groups: many(usersToGroups),
+}))
+
+// ajout de
+// users: many(usersToGroups),
+export const groupsRelations = relations(groups, ({many}) => ({
+  usersToGroups: many(usersToGroups),
+  users: many(usersToGroups),
+}))
+```
+
+Les requetes sont maintenant simplifiées
+
+```tsx
+const resultQuery = await db.query.users.findMany({
+    with: {
+      usersToGroups: {
+        with: {
+          group: true,
+        },
+      },
+    },
+  })
+```
+
+```tsx
+const resultQuery = await db.query.users.findMany({
+    with: {
+      groups: true,
+  })
+```
+
+Fichiers
+
+- `exercises/many-many/actions`
 
 ## Aller plus loin
 
-📑 Le lien vers la doc [https://www.w3schools.com/html/html_css.asp](https://www.w3schools.com/html/html_css.asp)
+📑 Le lien vers la doc [https://orm.drizzle.team/docs/rqb#many-to-many](https://orm.drizzle.team/docs/rqb#many-to-many)
 
 ## Ils vont t’aider
 
@@ -156,4 +252,4 @@ Fichiers
 
 ## 🐜 Feedback
 
-Remplir le formulaire le [formulaire de FeedBack](https://go.mikecodeur.com/cours-next-avis?entry.1912869708=Next%20PRO&entry.1430994900=Data%20Modeling&entry.533578441=07%20One%20to%20many).
+Remplir le formulaire le [formulaire de FeedBack](https://go.mikecodeur.com/cours-next-avis?entry.1912869708=Next%20PRO&entry.1430994900=Data%20Modeling&entry.533578441=08%20Many%20To%20Many).
