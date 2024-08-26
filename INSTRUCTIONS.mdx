@@ -1,6 +1,6 @@
-# Relation Many To Many
+# Create Read Update Delete
 
-### 💡 Comprendre les relations Many To Many
+### 💡 Faire un CRUD sur des produits
 
 ## 📝 Tes notes
 
@@ -8,239 +8,118 @@ Detaille ce que tu as appris ici, sur une page [Notion](https://go.mikecodeu
 
 ## Comprendre
 
-Rappel :
+Dans les sections précédentes, nous avons principalement fais des requete de lectures (Query et Select).
 
-Relation **N-N** (Many-to-Many)
+Nous allons voir maintenant comment Créer, Mettre à jour et supprimer des données.
 
-- **Description** : Un enregistrement dans la table A peut être associé à plusieurs enregistrements dans la table B, et vice versa.
-- **Exemple** : Les étudiants (`students`) et les cours (`courses`). Un étudiant peut suivre plusieurs cours, et un cours peut être suivi par plusieurs étudiants.
-- **Implémentation** : Création d'une table de jonction (ou d'association) avec deux clés étrangères, une pointant vers la table A et l'autre vers la table B.
-
-Exemple en SQL
-
-```sql
-CREATE TABLE students (
-    id SERIAL PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
-    email VARCHAR(255) UNIQUE NOT NULL,
-    enrollment_date DATE NOT NULL
-);
-
-CREATE TABLE courses (
-    id SERIAL PRIMARY KEY,
-    course_name VARCHAR(255) NOT NULL,
-    course_code VARCHAR(100) UNIQUE NOT NULL,
-    credits INT NOT NULL
-);
-```
-
-Table de jonction
-
-```sql
-CREATE TABLE student_courses (
-    student_id INT NOT NULL,
-    course_id INT NOT NULL,
-    PRIMARY KEY (student_id, course_id),
-    FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE,
-    FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE
-);
-// NOTE : La PK est une composition des 2 FK
-```
-
-De cette manière on peut dire :
-
-- 1 `Student` possède N `Course`
-- 1 `Course` Appartient à N `studient`
-
-**Avec Drizzle**
+**1 : Création de données**
 
 ```tsx
-
-export const students = pgTable("students", {
-    id: serial("id").primaryKey(),
-    name: varchar("name", { length: 255 }).notNull(),
-    email: varchar("email", { length: 255 }).notNull().unique(),
-    enrollment_date: date("enrollment_date").notNull(),
-});
-
-export const courses = pgTable("courses", {
-    id: serial("id").primaryKey(),
-    course_name: varchar("course_name", { length: 255 }).notNull(),
-    course_code: varchar("course_code", { length: 100 }).notNull().unique(),
-    credits: integer("credits").notNull(),
-});
-
-export const studentCourses = pgTable("student_courses", {
-    student_id: integer("student_id").notNull().references(() => students.id),
-    course_id: integer("course_id").notNull().references(() => courses.id),
-},
-(table) => ({
-    pk: primaryKey(table.student_id, table.course_id)
-}));
-
-// RELATION
-export const studentCoursesRelations = relations(studentCourses, ({ one }) => ({
-  student: one(students, {
-    fields: [studentCourses.student_id],
-    references: [students.id],
-  }),
-  course: one(courses, {
-    fields: [studentCourses.course_id],
-    references: [courses.id],
-  }),
-}));
-// Optionnel : Relations inversées pour `students` et `courses`
-export const studentsRelations = relations(students, ({ many }) => ({
-  courses: many(studentCourses, {
-    fields: [studentCourses.student_id],
-    references: [students.id],
-  }),
-}));
-
-export const coursesRelations = relations(courses, ({ many }) => ({
-  students: many(studentCourses, {
-    fields: [studentCourses.course_id],
-    references: [courses.id],
-  }),
-}));
+await db.insert(users).values({ name: 'Andrew' });
+// multiple row
+await db.insert(users).values([{ name: 'Andrew' }, { name: 'Dan' }]);
 ```
 
-📑 Le liens vers la doc [https://orm.drizzle.team/docs/rqb#many-to-many](https://orm.drizzle.team/docs/rqb#many-to-many)
+📑 Le liens vers la doc https://orm.drizzle.team/docs/insert#insert-one-row
 
-Des frameworks JavaScript modernes ont donc été créés pour relever certains des défis en créant par programme le DOM plutôt que de le définir à la main HTML.
+**2 : Mise à jour**
+
+```tsx
+await db.update(users)
+  .set({ name: 'Mr. Dan' })
+  .where(eq(users.name, 'Dan'));
+```
+
+📑 Le liens vers la doc https://orm.drizzle.team/docs/update
+
+**3 : Suppression**
+
+```tsx
+await db.delete(users).where(eq(users.name, 'Dan'));
+```
+
+📑 Le liens vers la doc https://orm.drizzle.team/docs/delete
 
 ## Exercice
 
-Dans cet exercice nous allons modéliser des groupes utilisateurs tel que
+Dans cet exercice nous avons notre page d’administration de produits.
 
-- 1 `Utilisateur` peut avoir plusieurs `Groupes`
-- 1 `Groupe` peut avoir plusieurs `Utilisateur`
+- Un tableau contenant la liste des produits
+- Un formulaire permettant l’ajout et l’édition de produit
 
-Il s’agit d’un relation `many` to `many`
+Le tout est déjà connecté aux `actions` comme nous l’avons fait des les modules précédents.
 
-**🐶 Dans un premier temps tu vas devoir modéliser les groupes dans `users`**
+Nous allons ici nous concentrer sur les requetes dans actions.
 
-- fichier `src/db/schema/users`
+- **🐶 Implémente les requêtes :**
+  - `getCategories` : Pour remplir la combobox category
+  - `getProducts(catId?: number)` : Tous les produits avec un filtre optionnel sur la `category`
+  - `getProductByName(name: string)`, recherche de produit par son nom, il sera utilise pour éviter les doublons
+  - `deleteProductDao` : La requête de suppression
+  - `insertProductDao` : La requête d’insertion
+  - `updateProductDao`: La requête de mise à jour
 
-Tu vas devoir créer
+<aside>
+💡 Nous les avons renommé Dao (Data Accès Object) pour ne pas les confondre avec les fonction de l’action
 
-- la table `groups`
-- la table de relation `users_to_groups` avec comme PK le combinaison de 2 FK
+</aside>
 
-📑 Doc composite PK [https://orm.drizzle.team/docs/indexes-constraints#composite-primary-key](https://orm.drizzle.team/docs/indexes-constraints#composite-primary-key)
+```tsx
+export const deleteProduct = async (product: Product) => {
+  await deleteProductDao(product.id)
+  revalidatePath('/exercises/crud')
+}
+```
 
-- la relation `groupsRelations` (many)
-- la relation `usersToGroupsRelations` (one)
+Nous ne voulons pas mélanger des fonctions lié a la BDD et aux actions, c’est le principe **SRP (Single Responsibility Principle)** de clean architecture
 
-**🐶 Dans un second temps tu vas devoir faire les `Queries`**
+PS : Pour simplifier l’inversion, mise à jour dans le formulaire nous avons créé une fonction `persist` qui se base sur l’id du produit
 
-- `getUsersWithGroups` : Les users avec leurs groupes
-- `getGroupsWithUsers` : Les groupes avec leurs users
+```tsx
+export async function persistProductDao(product: Product) {
+  await (product.id > 0 ? updateProductDao(product) : insertProductDao(product))
+}
+```
 
 Fichiers
 
-- `src/db/schema/users`
-- `exercises/many-many/actions`
+- `exercises/crud/action.tsx`
 
 ## Bonus
 
-### 1. 🚀 getGroupsWithUsersFilter
+### 1. 🚀 Upsert
 
-- **🐶 Dans cet exercice tu vas devoir filtrer par nom de groupe**
-
-Fait une recherche et récupère le groupe en fonction de son nom
+Précédemment nous avons gérer nous même le cas `Update` / `Insert` en faisant
 
 ```tsx
-export async function getGroupsWithUsersFilter(groupName: string) {
-...
-
-where: (groups, {eq}) => eq(groups.name, groupName),
+export async function persistProductDao(product: Product) {
+  await (product.id > 0 ? updateProductDao(product) : insertProduct(product))
+}
 ```
 
-Utilise `with` de plusieurs niveau pour pouvoir avoir tous les autres groupes des `users` de ce groupe
+`Drizzle` permet de faire des `Upsert` (Update / Insert).
+
+Doc : https://orm.drizzle.team/docs/insert#on-conflict-do-update
+
+Pour fonctionner on utiliser un `insert` + `onConflictDoUpdate`
 
 ```tsx
-with: {
-      usersToGroups: { ...
+await db.insert(users)
+  .values({ id: 1, name: 'Dan' })
+  .onConflictDoUpdate({ target: users.id, set: { name: 'John' } });
 ```
+
+- **🐶 Adapte la fonction `persistProductDao` en utilisant cette technique**
 
 Fichiers
 
-- `exercises/many-many/actions`
+- `exercises/crud/action.tsx`
 
-### 2. 🚀 Relation inverse direct
-
-Manipuler la table de jonction peut etre plus compliquer et moins claire dans le code. Par exemple on utilise `user?.usersToGroups` pour récupérer les groupes dans un cas
-
-```tsx
-//recuperation des groupes
-{user?.usersToGroups?.map((usersToGroup, index) => (
-  <Badge key={index} variant="secondary">
-      {usersToGroup.group.name}
-  </Badge>
-))}
-```
-
-Et pour récupérer les user : `group?.usersToGroups`
-
-```tsx
-{group?.usersToGroups?.map((usersToGroup, index) => (
-      <Badge key={index} variant="secondary">
-        {usersToGroup.user.name}
-      </Badge>
-    ))}
-```
-
-Pour simplifier cela il suffit de spécifier la relation inverse exemple `usersRelations`
-
-```tsx
-// ajout de
-// groups: many(usersToGroups),
-export const usersRelations = relations(users, ({one, many}) => ({
-  profileInfo: one(profileInfo, {
-    fields: [users.id],
-    references: [profileInfo.userId],
-  }),
-  usersToGroups: many(usersToGroups),
-  groups: many(usersToGroups),
-}))
-
-// ajout de
-// users: many(usersToGroups),
-export const groupsRelations = relations(groups, ({many}) => ({
-  usersToGroups: many(usersToGroups),
-  users: many(usersToGroups),
-}))
-```
-
-Les requetes sont maintenant simplifiées
-
-```tsx
-const resultQuery = await db.query.users.findMany({
-    with: {
-      usersToGroups: {
-        with: {
-          group: true,
-        },
-      },
-    },
-  })
-```
-
-```tsx
-const resultQuery = await db.query.users.findMany({
-    with: {
-      groups: true,
-  })
-```
-
-Fichiers
-
-- `exercises/many-many/actions`
+###
 
 ## Aller plus loin
 
-📑 Le lien vers la doc [https://orm.drizzle.team/docs/rqb#many-to-many](https://orm.drizzle.team/docs/rqb#many-to-many)
+📑 Le lien vers la doc [https://orm.drizzle.team/docs/insert#with-insert-clause](https://orm.drizzle.team/docs/insert#with-insert-clause)
 
 ## Ils vont t’aider
 
@@ -252,4 +131,4 @@ Fichiers
 
 ## 🐜 Feedback
 
-Remplir le formulaire le [formulaire de FeedBack](https://go.mikecodeur.com/cours-next-avis?entry.1912869708=Next%20PRO&entry.1430994900=Data%20Modeling&entry.533578441=08%20Many%20To%20Many).
+Remplir le formulaire le [formulaire de FeedBack](https://go.mikecodeur.com/cours-next-avis?entry.1912869708=Next%20PRO&entry.1430994900=Data%20Modeling&entry.533578441=09%20CRUD%20products).

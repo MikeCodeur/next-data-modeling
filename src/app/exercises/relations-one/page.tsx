@@ -1,6 +1,6 @@
 import db from '@/db/schema'
 
-export async function getUserWithProfiles(name?: string) {
+async function getUserWithProfiles(name?: string) {
   const resultQuery = await db.query.users.findFirst({
     with: {
       profileInfo: true,

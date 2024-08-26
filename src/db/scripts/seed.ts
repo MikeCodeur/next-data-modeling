@@ -53,24 +53,33 @@ const seed = async () => {
      `)
 
   await client.query(` 
-      INSERT INTO Category (name) VALUES
-      ('Electronics'),
-      ('Books'),
-      ('Clothing'),
-      ('Home Appliances'),
-      ('Sports Equipment');
+     INSERT INTO Category (name) VALUES
+('Electronics'),
+('Books'),
+('Clothing'),
+('Home Appliances'),
+('Sports Equipment');
 
-      INSERT INTO Product (title, price, description, image, category_id, quantity, createdat, updatedat) VALUES
-      ('Product 1', 19.99, 'Description for Product 1', 'image1.png', 1, 10, '2024-01-01 10:00:00', '2024-01-01 10:00:00'),
-      ('Product 2', 29.99, 'Description for Product 2', 'image2.png', 1, 20, '2024-01-02 11:00:00', '2024-01-02 11:00:00'),
-      ('Product 3', 39.99, 'Description for Product 3', 'image3.png', 2, 30, '2024-01-03 12:00:00', '2024-01-03 12:00:00'),
-      ('Product 4', 49.99, 'Description for Product 4', 'image4.png', 2, 40, '2024-01-04 13:00:00', '2024-01-04 13:00:00'),
-      ('Product 5', 59.99, 'Description for Product 5', 'image5.png', 3, 50, '2024-01-05 14:00:00', '2024-01-05 14:00:00'),
-      ('Product 6', 69.99, 'Description for Product 6', 'image6.png', 3, 60, '2024-01-06 15:00:00', '2024-01-06 15:00:00'),
-      ('Product 7', 79.99, 'Description for Product 7', 'image7.png', 4, 70, '2024-01-07 16:00:00', '2024-01-07 16:00:00'),
-      ('Product 8', 89.99, 'Description for Product 8', 'image8.png', 4, 80, '2024-01-08 17:00:00', '2024-01-08 17:00:00'),
-      ('Product 9', 99.99, 'Description for Product 9', 'image9.png', 5, 90, '2024-01-09 18:00:00', '2024-01-09 18:00:00'),
-      ('Product 10', 109.99, 'Description for Product 10', 'image10.png', 5, 100, '2024-01-10 19:00:00', '2024-01-10 19:00:00');
+INSERT INTO Product (title, price, description, image, category_id, quantity, createdat, updatedat) VALUES
+-- Electronics
+('iPhone 14 Pro', 999.99, 'Apple iPhone 14 Pro with A16 Bionic chip, 128GB storage', 'iphone14pro.png', 1, 50, '2024-01-01 10:00:00', '2024-01-01 10:00:00'),
+('Samsung QLED TV', 799.99, 'Samsung 55-inch QLED 4K UHD Smart TV', 'samsung_qled_tv.png', 1, 30, '2024-01-02 11:00:00', '2024-01-02 11:00:00'),
+
+-- Books
+('The Pragmatic Programmer', 49.99, 'Your Journey to Mastery, 20th Anniversary Edition', 'pragmatic_programmer.png', 2, 100, '2024-01-03 12:00:00', '2024-01-03 12:00:00'),
+('Clean Code', 39.99, 'A Handbook of Agile Software Craftsmanship by Robert C. Martin', 'clean_code.png', 2, 80, '2024-01-04 13:00:00', '2024-01-04 13:00:00'),
+
+-- Clothing
+('Levi’s 501 Original Jeans', 59.99, 'Iconic straight fit with button fly, 100% cotton', 'levis_501.png', 3, 200, '2024-01-05 14:00:00', '2024-01-05 14:00:00'),
+('Nike Air Max 270', 129.99, 'Nike Air Max 270 with revolutionary air sole unit', 'nike_air_max_270.png', 3, 150, '2024-01-06 15:00:00', '2024-01-06 15:00:00'),
+
+-- Home Appliances
+('Dyson V11 Vacuum Cleaner', 599.99, 'Dyson V11 Torque Drive Cordless Vacuum Cleaner', 'dyson_v11.png', 4, 40, '2024-01-07 16:00:00', '2024-01-07 16:00:00'),
+('Instant Pot Duo 7-in-1', 99.99, '7-in-1 Electric Pressure Cooker, 6 Quart', 'instant_pot_duo.png', 4, 60, '2024-01-08 17:00:00', '2024-01-08 17:00:00'),
+
+-- Sports Equipment
+('Adidas Ultraboost Running Shoes', 179.99, 'Adidas Ultraboost 21, high-performance running shoes', 'adidas_ultraboost.png', 5, 90, '2024-01-09 18:00:00', '2024-01-09 18:00:00'),
+('Fitbit Charge 5', 149.99, 'Fitbit Charge 5 Advanced Health & Fitness Tracker', 'fitbit_charge_5.png', 5, 120, '2024-01-10 19:00:00', '2024-01-10 19:00:00');
 
   `)
 
