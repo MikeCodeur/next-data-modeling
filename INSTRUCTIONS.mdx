@@ -1,6 +1,6 @@
-# Create Read Update Delete
+# Pagination
 
-### 💡 Faire un CRUD sur des produits
+### 💡 Faire une pagination avec `offset` / `limit`
 
 ## 📝 Tes notes
 
@@ -8,118 +8,54 @@ Detaille ce que tu as appris ici, sur une page [Notion](https://go.mikecodeu
 
 ## Comprendre
 
-Dans les sections précédentes, nous avons principalement fais des requete de lectures (Query et Select).
+Pour l’exercice nous utiliserons le composant Pagnination de Shadcn
 
-Nous allons voir maintenant comment Créer, Mettre à jour et supprimer des données.
+- https://ui.shadcn.com/docs/components/pagination#
 
-**1 : Création de données**
-
-```tsx
-await db.insert(users).values({ name: 'Andrew' });
-// multiple row
-await db.insert(users).values([{ name: 'Andrew' }, { name: 'Dan' }]);
-```
-
-📑 Le liens vers la doc https://orm.drizzle.team/docs/insert#insert-one-row
-
-**2 : Mise à jour**
+Nous l’avons adapté pour qu’il contienne des `Link` au lieu de `<a>`
 
 ```tsx
-await db.update(users)
-  .set({ name: 'Mr. Dan' })
-  .where(eq(users.name, 'Dan'));
+<Pagination>
+  <PaginationContent>
+    <PaginationItem>
+      <PaginationPrevious href="#" />
+    </PaginationItem>
 ```
 
-📑 Le liens vers la doc https://orm.drizzle.team/docs/update
+Le principe d’un pagination et de définir un point de départ dans la liste et un nombre d’élément
 
-**3 : Suppression**
+- Exemple sur un liste de 100 produits
+
+on peut demander 10 éléments à partir de la 50ème postions.
+
+`Drizzle` nous permet de requêter cela avec `limit` / `offset` : https://orm.drizzle.team/docs/select#limit--offset
 
 ```tsx
-await db.delete(users).where(eq(users.name, 'Dan'));
+await db.select().from(products).limit(10).offset(50);
 ```
 
-📑 Le liens vers la doc https://orm.drizzle.team/docs/delete
+📑 Le liens vers la doc [https://orm.drizzle.team/docs/select#limit--offset](https://orm.drizzle.team/docs/select#limit--offset)
 
 ## Exercice
 
-Dans cet exercice nous avons notre page d’administration de produits.
+**🐶** Dans cet exercice tu vas devoir implémenter la fonction
 
-- Un tableau contenant la liste des produits
-- Un formulaire permettant l’ajout et l’édition de produit
+- `getProductsPagination(nbElement: number, start: number)`
 
-Le tout est déjà connecté aux `actions` comme nous l’avons fait des les modules précédents.
+Tu vas devoir adapter le RSC `page.tsx` pour gérer correctement la pagination via la route
 
-Nous allons ici nous concentrer sur les requetes dans actions.
-
-- **🐶 Implémente les requêtes :**
-  - `getCategories` : Pour remplir la combobox category
-  - `getProducts(catId?: number)` : Tous les produits avec un filtre optionnel sur la `category`
-  - `getProductByName(name: string)`, recherche de produit par son nom, il sera utilise pour éviter les doublons
-  - `deleteProductDao` : La requête de suppression
-  - `insertProductDao` : La requête d’insertion
-  - `updateProductDao`: La requête de mise à jour
-
-<aside>
-💡 Nous les avons renommé Dao (Data Accès Object) pour ne pas les confondre avec les fonction de l’action
-
-</aside>
-
-```tsx
-export const deleteProduct = async (product: Product) => {
-  await deleteProductDao(product.id)
-  revalidatePath('/exercises/crud')
-}
-```
-
-Nous ne voulons pas mélanger des fonctions lié a la BDD et aux actions, c’est le principe **SRP (Single Responsibility Principle)** de clean architecture
-
-PS : Pour simplifier l’inversion, mise à jour dans le formulaire nous avons créé une fonction `persist` qui se base sur l’id du produit
-
-```tsx
-export async function persistProductDao(product: Product) {
-  await (product.id > 0 ? updateProductDao(product) : insertProductDao(product))
-}
-```
+- `exercises/pagination/x` ou x est la page en cours
 
 Fichiers
 
-- `exercises/crud/action.tsx`
+- `exercises/pagination/[page]/action`
+- `exercises/pagination/[page]/page`
 
-## Bonus
-
-### 1. 🚀 Upsert
-
-Précédemment nous avons gérer nous même le cas `Update` / `Insert` en faisant
-
-```tsx
-export async function persistProductDao(product: Product) {
-  await (product.id > 0 ? updateProductDao(product) : insertProduct(product))
-}
-```
-
-`Drizzle` permet de faire des `Upsert` (Update / Insert).
-
-Doc : https://orm.drizzle.team/docs/insert#on-conflict-do-update
-
-Pour fonctionner on utiliser un `insert` + `onConflictDoUpdate`
-
-```tsx
-await db.insert(users)
-  .values({ id: 1, name: 'Dan' })
-  .onConflictDoUpdate({ target: users.id, set: { name: 'John' } });
-```
-
-- **🐶 Adapte la fonction `persistProductDao` en utilisant cette technique**
-
-Fichiers
-
-- `exercises/crud/action.tsx`
-
-###
+##
 
 ## Aller plus loin
 
-📑 Le lien vers la doc [https://orm.drizzle.team/docs/insert#with-insert-clause](https://orm.drizzle.team/docs/insert#with-insert-clause)
+📑 Le lien vers la doc [https://www.w3schools.com/html/html_css.asp](https://www.w3schools.com/html/html_css.asp)
 
 ## Ils vont t’aider
 
@@ -131,4 +67,4 @@ Fichiers
 
 ## 🐜 Feedback
 
-Remplir le formulaire le [formulaire de FeedBack](https://go.mikecodeur.com/cours-next-avis?entry.1912869708=Next%20PRO&entry.1430994900=Data%20Modeling&entry.533578441=09%20CRUD%20products).
+Remplir le formulaire le [formulaire de FeedBack.](https://go.mikecodeur.com/cours-next-avis?entry.1912869708=Next%20PRO&entry.1430994900=Data%20Modeling&entry.533578441=10%20Pagination)
