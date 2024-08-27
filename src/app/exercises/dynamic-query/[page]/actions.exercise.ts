@@ -3,11 +3,28 @@
 import db from '@/db/schema'
 import {formSchema, FormSchemaType} from './schema'
 import {revalidatePath} from 'next/cache'
-import {InsertProduct, Product, products} from '@/db/schema/products'
-import {count, eq} from 'drizzle-orm'
+import {Product, products, ProductWithCategory} from '@/db/schema/products'
+import {asc, count, eq} from 'drizzle-orm'
+// 🐶 Importe le type 'PgSelect' de 'drizzle-orm/pg-core/query-builders'
 
+// 🤖 import {PgSelect} from 'drizzle-orm/pg-core/query-builders'
+import {categories, Category} from '@/db/schema/categories'
+
+// 🐶 le type générique 'T' doit étendre 'PgSelect'
+function withPagination<T>(
+  qb: T
+  // 🐶 Ajoute une 'page' et une 'pageSize' en paramètres
+) {
+  // 🐶 Implémente une 'limit' et un 'offset' pour gérer la pagination
+  return qb
+}
+// 🐶 Transfome cette fonction en utilisant les Dynamic Query
 export async function getProductsPagination(nbElement: number, start: number) {
-  const resultQuery = await db.query.products.findMany({
+  // 🐶 Transforme cette requete 'Query' en 'PgSelect'
+  // 🤖 const query = db.select().from(products) ...
+  // 🐶 pense a utiliser une jointure vers category
+  // 🤖 .leftJoin(categories, eq(categories.id, products.category))
+  const query = await db.query.products.findMany({
     offset: start,
     limit: nbElement,
     with: {
@@ -16,12 +33,38 @@ export async function getProductsPagination(nbElement: number, start: number) {
     orderBy: (product, {asc}) => [asc(product.id)],
   })
 
+  // 🐶 Rend cette requete dynamique avec '$dynamic'
+  // 🤖 const dynamicQuery = query.$dynamic()
+
+  // 🐶 Utilise 'withPagination'
+  // 🤖 const resultQuery = ...
+
   const rows = await db.select({count: count()}).from(products)
 
+  // 🐶 Transforme les données 'product' pour les rendre plus lisibles grace à
+  // 🤖 transformFlattenedData(resultQuery as FlattenedData[]),
   return {
-    products: resultQuery,
+    products: query, //transformFlattenedData(resultQuery as FlattenedData[]),
     totalProducts: rows[0].count,
   }
+}
+
+interface FlattenedData {
+  product: Product
+  category: Category | null | number
+}
+
+function transformFlattenedData(
+  flattenedData: FlattenedData[]
+): ProductWithCategory[] {
+  return flattenedData.map((item) => {
+    const productWithCategory: ProductWithCategory = {
+      ...item.product,
+      // @ts-ignore
+      category: item.category as Category | null | number,
+    }
+    return productWithCategory
+  })
 }
 
 export async function getProducts(catId?: number) {

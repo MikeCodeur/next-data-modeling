@@ -22,11 +22,6 @@ export default async function Page({params}: {params: {page: string}}) {
     start
   )
   const totalPages = Math.ceil(totalProducts / nbElement)
-  // console.log('currentPage', currentPage)
-  // console.log('nbElement', nbElement)
-  // console.log('start', start)
-  // console.log('totalProducts', totalProducts)
-  // console.log('totalPages', totalPages)
 
   const maxPagesToShow = 5 // Maximum number of pagination links to show
 
@@ -57,7 +52,7 @@ export default async function Page({params}: {params: {page: string}}) {
               <PaginationPrevious
                 href={
                   currentPage > 1
-                    ? `/exercises/pagination/${currentPage - 1}`
+                    ? `/exercises/dynamic-query/${currentPage - 1}`
                     : '#'
                 }
                 isActive={currentPage === 1}
@@ -67,7 +62,7 @@ export default async function Page({params}: {params: {page: string}}) {
             {pagesToShow.map((pageNum) => (
               <PaginationItem key={pageNum}>
                 <PaginationLink
-                  href={`/exercises/pagination/${pageNum}`}
+                  href={`/exercises/dynamic-query/${pageNum}`}
                   isActive={pageNum === currentPage}
                 >
                   {pageNum}
@@ -81,7 +76,7 @@ export default async function Page({params}: {params: {page: string}}) {
               <PaginationNext
                 href={
                   currentPage < totalPages
-                    ? `/exercises/pagination/${currentPage + 1}`
+                    ? `/exercises/dynamic-query/${currentPage + 1}`
                     : '#'
                 }
                 isActive={totalPages === currentPage}

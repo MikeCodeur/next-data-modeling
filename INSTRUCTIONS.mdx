@@ -1,6 +1,6 @@
-# Pagination
+# Dynamics Queries
 
-### 💡 Faire une pagination avec `offset` / `limit`
+### 💡 Comprendre les Dynamics Queries
 
 ## 📝 Tes notes
 
@@ -8,54 +8,136 @@ Detaille ce que tu as appris ici, sur une page [Notion](https://go.mikecodeu
 
 ## Comprendre
 
-Pour l’exercice nous utiliserons le composant Pagnination de Shadcn
+Dans ce module, nous allons explorer la construction de requêtes dynamiques avec `Drizzle` ORM.
 
-- https://ui.shadcn.com/docs/components/pagination#
+Ce concept est essentiel pour les développeurs qui souhaitent créer des requêtes complexes et évolutives en fonction des besoins spécifiques de leur application.
 
-Nous l’avons adapté pour qu’il contienne des `Link` au lieu de `<a>`
+En utilisant le mode dynamique de `Drizzle`, vous pouvez contourner les limitations des méthodes SQL traditionnelles et enrichir vos requêtes de manière flexible, en intégrant des fonctionnalités comme la pagination ou les jointures à la volée.
 
-```tsx
-<Pagination>
-  <PaginationContent>
-    <PaginationItem>
-      <PaginationPrevious href="#" />
-    </PaginationItem>
-```
-
-Le principe d’un pagination et de définir un point de départ dans la liste et un nombre d’élément
-
-- Exemple sur un liste de 100 produits
-
-on peut demander 10 éléments à partir de la 50ème postions.
-
-`Drizzle` nous permet de requêter cela avec `limit` / `offset` : https://orm.drizzle.team/docs/select#limit--offset
+On pourrait par exemple avoir besoin de combiner plusieurs clauses comme ceci, mais le query builder de `Drizzle` se veut etre le plus proche possible de la syntaxe SQL.
 
 ```tsx
-await db.select().from(products).limit(10).offset(50);
+const query = db
+  .select()
+  .from(users)
+  .where(eq(users.id, 1))
+  .where(eq(users.name, 'John')); // ❌ Type error - where() can only be invoked once
 ```
 
-📑 Le liens vers la doc [https://orm.drizzle.team/docs/select#limit--offset](https://orm.drizzle.team/docs/select#limit--offset)
+On pourrait également avoir envie de faire
+
+```tsx
+const query = db.select().from(users).where(eq(users.id, 1));
+// et puis
+query.limit(10).offset(50);
+// ❌ Type error - the query builder is not in dynamic mode
+```
+
+Pour pouvoir faire ceci il existe :
+
+**Dynamic Query Building :**
+
+```tsx
+function withFriends<T extends PgSelect>(qb: T) {
+  return qb.leftJoin(friends, eq(friends.userId, users.id));
+}
+let query = db.select().from(users).where(eq(users.id, 1)).$dynamic();
+query = withFriends(query);
+```
+
+📑 Le liens vers la doc [https://orm.drizzle.team/docs/dynamic-query-building](https://orm.drizzle.team/docs/dynamic-query-building)
 
 ## Exercice
 
-**🐶** Dans cet exercice tu vas devoir implémenter la fonction
+Dans cet exercice tu vas devoir utiliser les **Dynamic Query** pour gérer la pagination. En effet la pagination est une structure qui peut être réutilisé partout dans le code, avoir une fonction commune `withPagination` nous permet d’avoir une seule structure de pagination dans notre code.
 
-- `getProductsPagination(nbElement: number, start: number)`
+NOTE : Cela fonctionne uniquement avec les requête ‘Select’,
 
-Tu vas devoir adapter le RSC `page.tsx` pour gérer correctement la pagination via la route
+```tsx
+const result = await db.select().from(users);
+```
 
-- `exercises/pagination/x` ou x est la page en cours
+Cela **ne fonctionne pas** avec les requêtes relationnel
+
+```tsx
+const result = await db.query.users.findMany({
+  with: {
+    posts: true
+  },
+});
+// NE FONCTIONNE PAS AVEC LES DYNAMIC QUERY
+```
+
+NOTE 2 :
+
+Les requêtes relationnelles (`query`) retourne un résultat imbriqué
+
+```tsx
+row[0].product.category.name
+```
+
+Les requêtes SELECT avec jointures retourne les données a plat
+
+```tsx
+row[0].product
+row[0].category
+```
+
+Pour éviter d’avoir a changer toute la structure de notre page / tables / form, nous utiliser une fonction qui transforme une format plat en format imbriqué
+
+```tsx
+ transformFlattenedData(resultQuery as FlattenedData[]),
+```
+
+- **🐶 Implémente** `withPagination` **dans l’action**
 
 Fichiers
 
-- `exercises/pagination/[page]/action`
-- `exercises/pagination/[page]/page`
+- `exercises/dynamic-query/action.ts`
 
-##
+## Bonus
+
+### 1. 🚀 Composition
+
+Il est possible de composer nos requête dynamique.
+
+**🐶 Créé de nouvelles fonctions**
+
+- `withOrderBy` qui s’occupe du trie
+- `withCategories` qui s’occupe de la jointure de category
+
+Te que l’on puisse appeler
+
+```tsx
+const query = db.select().from(products)
+
+const dynamicQueryProduct = query.$dynamic()
+const dynamicQueryCat = withCategories(dynamicQueryProduct).$dynamic()
+const dynamicQuery = withOrderBy(dynamicQueryCat).$dynamic()
+const resultQuery = await withPagination(dynamicQuery, start, nbElement)
+```
+
+Ou bien en inline
+
+```tsx
+  const resultQuery = await withPagination(
+    withOrderBy(
+      withCategories(db.select().from(products).$dynamic()).$dynamic()
+    ).$dynamic(),
+    start,
+    nbElement
+  )
+```
+
+Fichiers
+
+- `exercises/dynamic-query/action.ts`
+
+###
 
 ## Aller plus loin
 
-📑 Le lien vers la doc [https://www.w3schools.com/html/html_css.asp](https://www.w3schools.com/html/html_css.asp)
+📑 Le lien vers la doc [https://orm.drizzle.team/docs/dynamic-query-building](https://orm.drizzle.team/docs/dynamic-query-building)
 
 ## Ils vont t’aider
 
@@ -67,4 +149,4 @@ Fichiers
 
 ## 🐜 Feedback
 
-Remplir le formulaire le [formulaire de FeedBack.](https://go.mikecodeur.com/cours-next-avis?entry.1912869708=Next%20PRO&entry.1430994900=Data%20Modeling&entry.533578441=10%20Pagination)
+Remplir le formulaire le [formulaire de FeedBack](https://go.mikecodeur.com/cours-next-avis?entry.1912869708=Next%20PRO&entry.1430994900=Data%20Modeling&entry.533578441=11%20Dynamic%20Query).
