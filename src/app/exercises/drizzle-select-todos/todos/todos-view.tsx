@@ -8,7 +8,7 @@ import {toast} from 'sonner'
 
 import React, {startTransition, useOptimistic} from 'react'
 import {addTodo as AddTodoAction} from './actions'
-import {Todo} from '@/db/schema/todos'
+import {Todo} from '@/db/models/todos'
 
 interface TodosProps {
   todos: Todo[]

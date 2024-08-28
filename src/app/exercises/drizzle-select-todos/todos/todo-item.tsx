@@ -5,7 +5,7 @@ import {cn} from '@/lib/utils'
 import {updateTodo as updateTodoAction} from './actions'
 import {toast} from 'sonner'
 import {startTransition, useOptimistic} from 'react'
-import {Todo} from '@/db/schema/todos'
+import {Todo} from '@/db/models/todos'
 
 type TodoOptimistic = Todo & {
   sending?: boolean

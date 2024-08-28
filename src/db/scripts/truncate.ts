@@ -1,12 +1,11 @@
 #!/usr/bin/env node
 
-import * as dotenv from 'dotenv'
-
 import {drizzle} from 'drizzle-orm/node-postgres'
 import pg from 'pg'
 import {sql} from 'drizzle-orm'
+import initDotEnv from './env'
 
-dotenv.config()
+initDotEnv()
 
 const runTruncate = async () => {
   if (!process.env.POSTGRES_NEXT_COURSE_URL) {

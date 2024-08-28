@@ -1,8 +1,8 @@
-import * as dotenv from 'dotenv'
-
 import {defineConfig} from 'drizzle-kit'
+import initDotEnv from './src/db/scripts/env'
 
-dotenv.config()
+initDotEnv()
+
 export default defineConfig({
   schema: './src/db/models/*',
   out: './drizzle/migrations',

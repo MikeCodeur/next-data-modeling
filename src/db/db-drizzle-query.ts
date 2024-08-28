@@ -62,6 +62,18 @@ export async function getCategoriesWithProducts() {
   return resultQuery
 }
 
+export async function getCategoriesByIdWithProducts(catId?: number) {
+  const resultQuery = await db.query.categories.findMany({
+    with: {
+      products: true,
+    },
+    where: catId ? (categories, {eq}) => eq(categories.id, catId) : undefined,
+    orderBy: (categories, {asc}) => [asc(categories.id)],
+  })
+
+  return resultQuery
+}
+
 export async function getUserWithProfiles(name?: string) {
   const resultQuery = await db.query.users.findFirst({
     // with: {

@@ -1,13 +1,14 @@
 #!/usr/bin/env node
 
-import * as dotenv from 'dotenv'
-
 import {drizzle} from 'drizzle-orm/node-postgres'
 import pg from 'pg'
 import {sql} from 'drizzle-orm'
 
 import fs from 'node:fs'
 import path from 'node:path'
+import initDotEnv from './env'
+
+initDotEnv()
 
 export const readSQLFile = (filePath: string): string => {
   try {
@@ -19,8 +20,6 @@ export const readSQLFile = (filePath: string): string => {
     throw error
   }
 }
-
-dotenv.config()
 
 const runClean = async () => {
   if (!process.env.POSTGRES_NEXT_COURSE_URL) {

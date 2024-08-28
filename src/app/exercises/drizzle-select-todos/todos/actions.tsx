@@ -4,7 +4,7 @@ import {
   addTodo as addTodoDao,
   updateTodo as updateTodoDao,
 } from '@/db/db-drizzle-select'
-import {AddTodo, Todo} from '@/db/schema/todos'
+import {AddTodo, Todo} from '@/db/models/todos'
 
 import {revalidatePath} from 'next/cache'
 
