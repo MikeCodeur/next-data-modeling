@@ -1,6 +1,6 @@
-# Dynamics Queries
+# Transactions
 
-### 💡 Comprendre les Dynamics Queries
+### 💡 Comprendre les transactions
 
 ## 📝 Tes notes
 
@@ -8,136 +8,275 @@ Detaille ce que tu as appris ici, sur une page [Notion](https://go.mikecodeu
 
 ## Comprendre
 
-Dans ce module, nous allons explorer la construction de requêtes dynamiques avec `Drizzle` ORM.
+Dans une application, il arrive fréquemment que certaines fonctionnalités soit un ensemble d’opérations. Prenons par exemple un achat en ligne. Les opérations pourrait être :
 
-Ce concept est essentiel pour les développeurs qui souhaitent créer des requêtes complexes et évolutives en fonction des besoins spécifiques de leur application.
+1. **Vérification du stock** : Vérifier que le produit commandé est bien en stock.
+2. **Débit du compte client** : Débiter le montant de l'achat sur le compte du client.
+3. **Mise à jour du stock** : Réduire la quantité en stock du produit acheté.
+4. **Création de la commande** : Enregistrer la commande dans la base de données.
 
-En utilisant le mode dynamique de `Drizzle`, vous pouvez contourner les limitations des méthodes SQL traditionnelles et enrichir vos requêtes de manière flexible, en intégrant des fonctionnalités comme la pagination ou les jointures à la volée.
+Que se passe-t-il si un problème survient à l’étape 3 ?
 
-On pourrait par exemple avoir besoin de combiner plusieurs clauses comme ceci, mais le query builder de `Drizzle` se veut etre le plus proche possible de la syntaxe SQL.
+- On s’arrête et affiche un message d’erreur ?
 
-```tsx
-const query = db
-  .select()
-  .from(users)
-  .where(eq(users.id, 1))
-  .where(eq(users.name, 'John')); // ❌ Type error - where() can only be invoked once
-```
+Oui mais l’opération l’étape 2 **Débit du compte client,** à déjà été exécuté
 
-On pourrait également avoir envie de faire
+- Comment faire ? Gérer cela fonctionnellement
 
 ```tsx
-const query = db.select().from(users).where(eq(users.id, 1));
-// et puis
-query.limit(10).offset(50);
-// ❌ Type error - the query builder is not in dynamic mode
-```
+async function processOrder() {
+  try {
+    // 1. Vérification du stock
+    const stock = await checkStock(productId);
+    if (stock <= 0) {
+      throw new Error("Produit en rupture de stock");
+    }
 
-Pour pouvoir faire ceci il existe :
+    // 2. Débit du compte client
+    const debitSuccess = await debitAccount(accountId, amount);
+    if (!debitSuccess) {
+      throw new Error("Échec du débit du compte client");
+    }
 
-**Dynamic Query Building :**
+    // 3. Mise à jour du stock
+    const updateStockSuccess = await updateStock(productId);
+    if (!updateStockSuccess) {
+      // Problème à l'étape 3, on recrédite le compte
+      await creditAccount(accountId, amount);
+      throw new Error("Échec de la mise à jour du stock. Compte recrédité.");
+    }
 
-```tsx
-function withFriends<T extends PgSelect>(qb: T) {
-  return qb.leftJoin(friends, eq(friends.userId, users.id));
+    // 4. Création de la commande
+    const orderCreated = await createOrder(orderId, productId, accountId, amount);
+    if (!orderCreated) {
+      // Problème à l'étape 4, on recrédite le compte et on remet le stock
+      await creditAccount(accountId, amount);
+      await restoreStock(productId);
+      throw new Error("Échec de la création de la commande. Compte recrédité et stock restauré.");
+    }
+
+    console.log("Commande traitée avec succès");
+
+  } catch (error) {
+    console.error("Erreur lors du traitement de la commande:", error.message);
+  }
 }
-let query = db.select().from(users).where(eq(users.id, 1)).$dynamic();
-query = withFriends(query);
 ```
 
-📑 Le liens vers la doc [https://orm.drizzle.team/docs/dynamic-query-building](https://orm.drizzle.team/docs/dynamic-query-building)
+Cela peut vite poser des problèmes et notre base de données peut se retrouver dans un état incohérent.
+
+Les bases de données relationnel nous permettent de gérer des `Transactions`
+
+### Transactions
+
+Le transactionnel en SQL est un concept fondamental qui permet de regrouper plusieurs opérations de base de données en une seule unité de travail, appelée transaction.
+
+Une transaction garantit que toutes les opérations s'exécutent de manière atomique, c'est-à-dire qu'elles réussissent toutes ou sont toutes annulées en cas d'échec, assurant ainsi l'intégrité des données.
+
+Ce mécanisme est particulièrement crucial dans les systèmes où les erreurs ou les interruptions peuvent compromettre la cohérence des données.
+
+Les transactions suivent les propriétés ACID (Atomicité, Cohérence, Isolation, Durabilité), qui sont essentielles pour garantir la fiabilité des opérations en base de données.
+
+### Transactions avec Drizzle
+
+Les transactions s’utilise avec `db.transaction`
+
+```tsx
+await db.transaction(async (tx) => {
+  await tx.update(accounts).set({ balance: sql`${accounts.balance} - 100.00` }).where(eq(users.name, 'Dan'));
+  await tx.update(accounts).set({ balance: sql`${accounts.balance} + 100.00` }).where(eq(users.name, 'Andrew'));
+});
+```
+
+Si une erreur survient sur une des opérations de la transaction, on `rollback`.
+
+Il est également possible de `rollback` dans le code. Exemple
+
+```tsx
+if (account.balance < 100) {
+  // This throws an exception that rollbacks the transaction.
+  tx.rollback()
+}
+
+// ou en levant un Error
+if (account.balance < 100) {
+   // This throws an exception that rollbacks the transaction.
+	 throw new Error(`Insufficient funds in ${accountUserId1}'s account`)
+}
+
+```
+
+📑 Le liens vers la doc [https://orm.drizzle.team/docs/transactions](https://orm.drizzle.team/docs/transactions)
 
 ## Exercice
 
-Dans cet exercice tu vas devoir utiliser les **Dynamic Query** pour gérer la pagination. En effet la pagination est une structure qui peut être réutilisé partout dans le code, avoir une fonction commune `withPagination` nous permet d’avoir une seule structure de pagination dans notre code.
-
-NOTE : Cela fonctionne uniquement avec les requête ‘Select’,
+Dans cet exercice nous avons ajouté une table pour les compte bancaire ‘`accounts`’
 
 ```tsx
-const result = await db.select().from(users);
+export const accounts = pgTable('accounts', {
+  id: serial('id').primaryKey(),
+  userId: integer('user_id')
+    .references(() => users.id)
+    .notNull(),
+  balance: numeric('balance', {precision: 10, scale: 2})
+    .default(sql`0`)
+    .notNull(),
+  blocked: boolean('blocked').default(false),
+})
+
 ```
 
-Cela **ne fonctionne pas** avec les requêtes relationnel
+Nous avons lié `account` à `user`
 
 ```tsx
-const result = await db.query.users.findMany({
-  with: {
-    posts: true
-  },
-});
-// NE FONCTIONNE PAS AVEC LES DYNAMIC QUERY
+export const accountRelations = relations(accounts, ({one}) => ({
+  user: one(users, {
+    fields: [accounts.userId],
+    references: [users.id],
+  }),
+}))
 ```
 
-NOTE 2 :
-
-Les requêtes relationnelles (`query`) retourne un résultat imbriqué
+Et nous avons la fonction `getAccountByUserId`
 
 ```tsx
-row[0].product.category.name
+export async function getAccountByUserId(userId: number) {
+  const userAccounts = await db
+    .select()
+    .from(accounts)
+    .where(eq(accounts.userId, userId))
+  return userAccounts[0]
+}
 ```
 
-Les requêtes SELECT avec jointures retourne les données a plat
+Et nous avons une fonction `transferFunds` qui est un ensemble de plusieurs opérations SQL
+
+- `Select` Account 1
+- `Select` Account 2
+- `Update` Account 1 (débit)
+- `Update` Account 2 (crédit)
+- Un fonction qui génère aléatoirement un erreur
 
 ```tsx
-row[0].product
-row[0].category
+
+export async function transferFunds(
+  accountUserId1: number,
+  accountUserId2: number,
+  amount: number
+) {
+  try {
+    // Vérification du solde du compte source
+    const [account1] = await db
+      .select()
+      .from(accounts)
+      .where(eq(accounts.userId, accountUserId1))
+
+    const [account2] = await db
+      .select()
+      .from(accounts)
+      .where(eq(accounts.userId, accountUserId2))
+
+
+    // Débit du compte source
+    await db
+      .update(accounts)
+      .set({balance: sql`${accounts.balance} - ${amount}`})
+      .where(eq(accounts.userId, accountUserId1))
+
+    // Simulation d'une erreur aléatoire pour illustrer l'absence de transaction
+    if (Math.random() < 0.5) {
+      throw new Error("Une erreur aléatoire s'est produite après le débit !")
+    }
+
+    // Crédit du compte de destination (ce code peut ne pas être atteint en cas d'erreur)
+    await db
+      .update(accounts)
+      .set({balance: sql`${accounts.balance} + ${amount}`})
+      .where(eq(accounts.userId, accountUserId2))
+
+}
 ```
 
-Pour éviter d’avoir a changer toute la structure de notre page / tables / form, nous utiliser une fonction qui transforme une format plat en format imbriqué
+**Lorsque l’erreur est levée, le compte est débité, mais le compte receveur n’est pas crédité**
 
-```tsx
- transformFlattenedData(resultQuery as FlattenedData[]),
-```
-
-- **🐶 Implémente** `withPagination` **dans l’action**
+- **🐶 Adapte la fonction** `transferFunds` pour la rendre transactionnelle
 
 Fichiers
 
-- `exercises/dynamic-query/action.ts`
+- `exercises/transaction/action.tsx`
 
 ## Bonus
 
-### 1. 🚀 Composition
+### 1. 🚀 Rollback & TransactionRollbackError
 
-Il est possible de composer nos requête dynamique.
-
-**🐶 Créé de nouvelles fonctions**
-
-- `withOrderBy` qui s’occupe du trie
-- `withCategories` qui s’occupe de la jointure de category
-
-Te que l’on puisse appeler
+`Drizzle` nous permet de faire un `rollback` avec `tx.rollback()`. (au lieu de levé un error). Ce n’est pas la meilleures des manière mais nous allons voir comment faire. Il suffit de remplacer :
 
 ```tsx
-const query = db.select().from(products)
-
-const dynamicQueryProduct = query.$dynamic()
-const dynamicQueryCat = withCategories(dynamicQueryProduct).$dynamic()
-const dynamicQuery = withOrderBy(dynamicQueryCat).$dynamic()
-const resultQuery = await withPagination(dynamicQuery, start, nbElement)
+if (!account1 || Number(account1.balance) < amount) {
+   throw new Error(`Insufficient funds in ${accountUserId1}'s account`)
+}
 ```
 
-Ou bien en inline
+par
 
 ```tsx
-  const resultQuery = await withPagination(
-    withOrderBy(
-      withCategories(db.select().from(products).$dynamic()).$dynamic()
-    ).$dynamic(),
-    start,
-    nbElement
-  )
+if (!account1 || Number(account1.balance) < amount) {
+   tx.rollback()
+}
+// Lève une erreur
+// MAIS ne permet pas d'indiquer la cause
+```
+
+Mais nous pouvons distinguer le type d’erreur dans le `catch` pour rendre le message moins générique car
+
+```tsx
+catch (error: unknown) {
+  if (error instanceof Error) {
+    console.error(`Transaction failed: ${error.message}`)
+  } else {
+    console.error('Transaction failed: Unknown error')
+  }
+  throw error
+}
+// car seulement afficher le message 'rollback'
+```
+
+Nous voulons distinguer les cas suivant
+
+- `Error` générique inconnue
+- `Error` de type `Error`
+- `Error` Drizzle type `DrizzleError` (par exemple erreur SQL, contraintes ou autres)
+- `Error` de transaction type `TransactionRollbackError` (par exemple un rolback)
+
+**🐶 implémente cela**
+
+```tsx
+if (error instanceof TransactionRollbackError) {
+      console.error(`Transaction failed: ${error.message}`)
+      throw new Error('Transaction failed: Rollback')
+    }
+    if (error instanceof DrizzleError) {
+      console.error(`Transaction failed: ${error.message}`)
+      throw new Error('BDD error : Rollback')
+    }
+    if (error instanceof Error) {
+      console.error(`Transaction failed: ${error.message}`)
+    } else {
+      console.error('Transaction failed: Unknown error')
+    }
+    throw error
+  }
 ```
 
 Fichiers
 
-- `exercises/dynamic-query/action.ts`
+- `exercises/transaction/action.tsx`
 
 ###
 
 ## Aller plus loin
 
-📑 Le lien vers la doc [https://orm.drizzle.team/docs/dynamic-query-building](https://orm.drizzle.team/docs/dynamic-query-building)
+📑 Le lien vers la doc [https://www.w3schools.com/html/html_css.asp](https://www.w3schools.com/html/html_css.asp)
 
 ## Ils vont t’aider
 
@@ -149,4 +288,4 @@ Fichiers
 
 ## 🐜 Feedback
 
-Remplir le formulaire le [formulaire de FeedBack](https://go.mikecodeur.com/cours-next-avis?entry.1912869708=Next%20PRO&entry.1430994900=Data%20Modeling&entry.533578441=11%20Dynamic%20Query).
+Remplir le formulaire le [formulaire de FeedBack](https://go.mikecodeur.com/cours-next-avis?entry.1912869708=Next%20PRO&entry.1430994900=Data%20Modeling&entry.533578441=12%20Les%Transactions).

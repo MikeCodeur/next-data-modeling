@@ -134,9 +134,16 @@ INSERT INTO Product (title, price, description, image, category_id, quantity, cr
 
     `)
 
+  await client.query(` 
+    INSERT INTO accounts (user_id, balance, blocked) VALUES
+    ((SELECT id FROM users WHERE name = 'Alice'), 10000.00, false),
+    ((SELECT id FROM users WHERE name = 'Bob'), 15000.00, false),
+    ((SELECT id FROM users WHERE name = 'Blocked'), 15000.00, true);
+    `)
+
   const end = Date.now()
 
-  console.log('✅ Connexion checked in', end - start, 'ms')
+  console.log('✅ Seed inserted in', end - start, 'ms')
 
   process.exit(0)
 }

@@ -102,3 +102,8 @@ INSERT INTO users_to_groups (user_id, group_id) VALUES
 INSERT INTO users_to_groups (user_id, group_id) VALUES
 ((SELECT id FROM users WHERE name = 'Grace'), (SELECT id FROM groups WHERE name = 'User')),
 ((SELECT id FROM users WHERE name = 'Grace'), (SELECT id FROM groups WHERE name = 'Guest'));
+
+INSERT INTO accounts (user_id, balance, blocked) VALUES
+((SELECT id FROM users WHERE name = 'Alice'), 10000.00, false),
+((SELECT id FROM users WHERE name = 'Bob'), 15000.00, false),
+((SELECT id FROM users WHERE name = 'Blocked'), 15000.00, true);

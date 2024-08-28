@@ -87,6 +87,13 @@ export default function AppLayout({children}: PropsWithChildren) {
                 <span>Dynamic Query</span>
               </Link>
 
+              <Link
+                className="flex items-center space-x-2 font-bold"
+                href="/exercises/transaction"
+              >
+                <span>Transactions</span>
+              </Link>
+
               <div className="hidden items-center space-x-2 md:flex"></div>
             </div>
             <div className="flex items-center space-x-2">

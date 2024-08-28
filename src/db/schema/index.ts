@@ -7,6 +7,7 @@ import * as todos from './todos'
 import * as users from './users'
 import * as categories from './categories'
 import * as products from './products'
+import * as accounts from './accounts'
 
 const pool = new Pool({
   connectionString: process.env.POSTGRES_URL_LOCAL,
@@ -16,10 +17,10 @@ const poolVercel = createPool({
 })
 
 const dbPg = drizzle(pool, {
-  schema: {...todos, ...users, ...categories, ...products},
+  schema: {...todos, ...users, ...categories, ...products, ...accounts},
 })
 const dbVercel = drizzleVercel(poolVercel, {
-  schema: {...todos, ...users, ...categories, ...products},
+  schema: {...todos, ...users, ...categories, ...products, ...accounts},
 })
 
 const isVercel = true
