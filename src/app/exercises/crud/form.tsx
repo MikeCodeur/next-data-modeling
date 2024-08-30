@@ -31,9 +31,8 @@ import {Product} from '@/db/schema/products'
 import {Category} from '@/db/schema/categories'
 
 export default function ProductForm({product}: {product?: Product}) {
-  const [state, formAction] = useActionState(onSubmitAction, {
-    success: true,
-  })
+  const [state, formAction] = useActionState(onSubmitAction, {})
+
   const [isPending, setIsPending] = React.useState(false)
   const [categories, setCategories] = React.useState<Category[]>([])
 
@@ -54,7 +53,7 @@ export default function ProductForm({product}: {product?: Product}) {
   }
 
   React.useEffect(() => {
-    if (state?.success) {
+    if (state.success === true) {
       toast.success('Product saved')
       form.reset({
         id: undefined,
@@ -65,7 +64,7 @@ export default function ProductForm({product}: {product?: Product}) {
         description: '',
         price: 0,
       })
-    } else {
+    } else if (state.success === false) {
       //set rhf errors form the server errors
       for (const error of state?.errors ?? []) {
         form.setError(error.field, {type: 'manual', message: error.message})
@@ -74,7 +73,7 @@ export default function ProductForm({product}: {product?: Product}) {
       toast.error(state.message ?? 'Error')
     }
     setIsPending(false)
-  }, [form, state, state?.success])
+  }, [state.success])
 
   React.useEffect(() => {
     form.reset({
