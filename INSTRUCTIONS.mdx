@@ -4,22 +4,22 @@
 
 ## 📝 Tes notes
 
-Detaille ce que tu as appris ici, sur une page [Notion](https://go.mikecodeur.com/course-notes-template)
+Détaille ce que tu as appris ici, sur une page [Notion](https://go.mikecodeur.com/course-notes-template)
 
 ## Comprendre
 
-Il est important d’avoir une codebase en phase avec la modélisation de notre base de données. Dans les modules précèdent nous avions
+Il est important d’avoir un code base en phase avec la modélisation de notre base de données. Dans les modules précédents, nous avions :
 
-- Des Scripts SQL pour créer notre model de données
-- Notre code base
+- Des Scripts SQL pour créer notre model de données.
+- Notre code base.
 
-S'assurer que tout est en phase peut être fastidieux et l’on est jamais à l’abris d’un oublie. Dans une application il y à gérer le développement de nouvelle `feature` mais aussi l’évolution.
+S'assurer que tout est en phase peut être fastidieux et l’on n’est jamais à l’abris d’un oubli. Dans une application, il y a à gérer le développement de nouvelle `feature` mais aussi l’évolution.
 
 Comment gérer la suppression, l’ajout ou la modification d’une table, colonne, type ? Cela peut vite devenir compliqué.
 
 ### Drizzle Kit
 
-`Drizzle kit` est un utilitaire nous permettant plusieurs choses mais les plus importantes sont
+`Drizzle kit` est un utilitaire nous permettant plusieurs choses mais les plus importantes sont :
 
 - La génération du model de données
 
@@ -47,9 +47,9 @@ CREATE TABLE IF NOT EXISTS "user" (
 );
 ```
 
-- La gestion des migration
+- La gestion des migrations
 
-C’est à dire les scripts permettant de passer d’une version à une autre
+C’est à dire les scripts permettant de passer d’une version à une autre.
 
 Admettons l’ajout d’une colonne `isVerified: boolean("is_verified"),`
 
@@ -68,11 +68,11 @@ export const user = pgTable("user", {
 ALTER TABLE "user" ADD COLUMN "is_verified" boolean;
 ```
 
-📑 Le liens vers la doc : [https://orm.drizzle.team/kit-docs/overview#overview](https://orm.drizzle.team/kit-docs/overview#overview)
+📑 Le lien vers la doc : [https://orm.drizzle.team/kit-docs/overview#overview](https://orm.drizzle.team/kit-docs/overview#overview)
 
 ## Exercice
 
-Dans cet exercice nous allons créer plusieurs scripts, la première chose est d’ajouter la dépendance vers `drizzle` kit
+Dans cet exercice, nous allons créer plusieurs scripts, la première chose est d’ajouter la dépendance vers `drizzle` kit :
 
 ```json
 //package.json
@@ -80,7 +80,7 @@ Dans cet exercice nous allons créer plusieurs scripts, la première chose est d
     "drizzle-kit": "^0.24.0",
 ```
 
-Ensuite les scripts
+Ensuite les scripts :
 
 ```json
 "db:generate": "drizzle-kit generate", //generation des scripts
@@ -89,7 +89,7 @@ Ensuite les scripts
 "db:reset-seed": "pnpm db:clear && pnpm db:generate && pnpm db:migrate && pnpm db:seed" // Tout renegenerer
 ```
 
-**🐶** Pour que ces scripts fonctionnent tu vas creer un fichier de configuration drizzle
+**🐶** Pour que ces scripts fonctionnent, tu vas créer un fichier de configuration `drizzle`.
 
 Fichiers
 
@@ -100,7 +100,7 @@ Fichiers
 
 ### 1. 🚀 Studio
 
-Essaye le studio (en beta)
+Essaie le studio (en beta) :
 
 ```json
 "db:studio": "drizzle-kit studio" // permet de lancer une interface legere
@@ -108,13 +108,13 @@ Essaye le studio (en beta)
 
 [Se connecter à l’interface](https://local.drizzle.studio/)
 
-Il est intéressant de voir que l’on peux :
+Il est intéressant de voir que l’on peut :
 
 - Exécuter des requêtes `SQL`
 - Exécuter des requêtes `Drizzle`
 - Introspecter les tables dans l’onglet `shema`
 
-Créer une nouvelle table `TOTO` et constate l’introspection
+Crée une nouvelle table `TOTO` et constate l’introspection :
 
 ```sql
 CREATE TABLE TOTO (
@@ -144,4 +144,4 @@ Fichiers
 
 ## 🐜 Feedback
 
-Remplir le formulaire le [formulaire de FeedBack](https://go.mikecodeur.com/cours-next-avis?entry.1912869708=Next%20PRO&entry.1430994900=Data%20Modeling&entry.533578441=05%20Drizzle%20Kit).
+Remplir le formulaire le [formulaire de FeedBack](https://go.mikecodeur.com/cours-next-avis?entry.1912869708=Next%20PRO&entry.1430994900=06.Data%20Modeling&entry.533578441=05%20Drizzle%20Kit).

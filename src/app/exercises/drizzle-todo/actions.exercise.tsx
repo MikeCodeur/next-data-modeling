@@ -1,24 +1,24 @@
 'use server'
 
-// ⛏️ supprime ces type deprecated
+// ⛏️ Supprime ces types `deprecated`
 import {AddTodo, Todo} from '@/lib/type'
-// 🐶 Utilise les types venant du shema Todo
+// 🐶 Utilise les types venant du schéma `Todo`
 // 🤖 import {AddTodo, Todo, todos} from '@/db/schema/todos'
 import {revalidatePath} from 'next/cache'
 
-// 🐶 Importe 'db' de drizzle, car nous allons migrer sous dirzzle
+// 🐶 Importe `db` de `drizzle`, car nous allons migrer sous `dirzzle`
 // 🤖 import db from '@/db/schema'
 
-// 🐶 nous gardons le pool pour le moment mais il ne sera plus utile
+// 🐶 Nous gardons le `pool` pour le moment mais il ne sera plus utile
 import {createPool} from '@vercel/postgres'
 
 const pool = createPool({
   connectionString: process.env.POSTGRES_URL,
 })
 
-// 🐶 Nous allons migrer cette fonction sous drizzle
+// 🐶 Nous allons migrer cette fonction sous `drizzle`
 export async function getTodos(): Promise<Todo[]> {
-  //⛏️ supprime ce code
+  //⛏️ Supprime ce code
   const {rows} = await pool.sql<Todo>`SELECT id, 
       title, 
       iscompleted AS "isCompleted", 
@@ -26,11 +26,11 @@ export async function getTodos(): Promise<Todo[]> {
       updatedat AS "updatedAt" from TODO order by createdAt asc limit 100`
   return rows
 
-  // 🐶 Fait un SELECT FROM en utilisant Drizzle
+  // 🐶 Fais un `SELECT FROM` en utilisant `Drizzle`
   // 📑 doc : https://orm.drizzle.team/docs/select
   // 🤖 const result = await db.select ...
 
-  // 🐶 pense a trier par id descendant
+  // 🐶 Pense à trier par `id` descendant
   // 📑 doc :https://orm.drizzle.team/docs/select#order-by
 }
 
