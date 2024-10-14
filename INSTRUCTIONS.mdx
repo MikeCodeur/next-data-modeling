@@ -4,50 +4,50 @@
 
 ## 📝 Tes notes
 
-Detaille ce que tu as appris ici, sur une page [Notion](https://go.mikecodeur.com/course-notes-template)
+Détaille ce que tu as appris ici, sur une page [Notion](https://go.mikecodeur.com/course-notes-template)
 
 ## Comprendre
 
-Une fois que nous avons notre base de données installé correctement et que nous avons toutes les informations de connexion, il est possible de créer un client qui va se connecter à notre base de données.
+Une fois que nous avons notre base de données installée correctement et que nous avons toutes les informations de connexion, il est possible de créer un client qui va se connecter à notre base de données.
 
-Les connexions base de données nécessites une ouverture de connexion et une fermeture.
+Les connexions base de données nécessitent une ouverture de connexion et une fermeture.
 
-### Exemple avec avec [Vercel Postgres](https://vercel.com/docs/storage/vercel-postgres/sdk)
+### Exemple avec avec [Vercel Postgres](https://vercel.com/docs/storage/vercel-postgres/sdk) :
 
 ```tsx
-import { createClient } from '@vercel/postgres';
+import {createClient} from '@vercel/postgres'
 
 async function queryPosts() {
-  const client = createClient();
-  await client.connect();
+  const client = createClient()
+  await client.connect()
 
   try {
-    const likes = 100;
-    const { rows, fields } =
-      await client.sql`SELECT * FROM posts WHERE likes > ${likes};`;
+    const likes = 100
+    const {rows, fields} =
+      await client.sql`SELECT * FROM posts WHERE likes > ${likes};`
   } finally {
-    await client.end();
+    await client.end()
   }
 }
 ```
 
-`Vercel` nous simplifie cette tache la en utilisant `sql`
+`Vercel` nous simplifie cette tâche-là en utilisant `sql`
 
-Il se base sur une variable d’environnement (`process.env.POSTGRES_URL`) pour creer une client / pool de connexion
+Il se base sur une variable d’environnement (`process.env.POSTGRES_URL`) pour créer un client / pool de connexion.
 
 📑 Le lien vers la doc : [https://vercel.com/docs/storage/vercel-postgres/sdk#sql](https://vercel.com/docs/storage/vercel-postgres/sdk#sql)
 
-Cela simplifie grandement l’écriture de RSC
+Cela simplifie grandement l’écriture de `RSC` :
 
 ```tsx
-import { sql } from "@vercel/postgres";
+import {sql} from '@vercel/postgres'
 
 export default async function Cart({
-  params
-} : {
-  params: { user: string }
+  params,
+}: {
+  params: {user: string}
 }): Promise<JSX.Element> {
-  const { rows } = await sql`SELECT * from CARTS where user_id=${params.user}`;
+  const {rows} = await sql`SELECT * from CARTS where user_id=${params.user}`
 
   return (
     <div>
@@ -57,36 +57,36 @@ export default async function Cart({
         </div>
       ))}
     </div>
-  );
+  )
 }
 ```
 
-### Exemple avec avec [Node-Postges](https://orm.drizzle.team/docs/get-started-postgresql#node-postgres)
+### Exemple avec avec [Node-Postges](https://orm.drizzle.team/docs/get-started-postgresql#node-postgres) :
 
-- Création du client
+- Création du client :
 
 ```tsx
-import { Client } from "pg";
+import {Client} from 'pg'
 
 const client = new Client({
-  connectionString: "postgres://user:password@host:port/db",
-});
+  connectionString: 'postgres://user:password@host:port/db',
+})
 // or
 const client = new Client({
-  host: "127.0.0.1",
+  host: '127.0.0.1',
   port: 5432,
-  user: "postgres",
-  password: "password",
-  database: "db_name",
-});
+  user: 'postgres',
+  password: 'password',
+  database: 'db_name',
+})
 
 //connexion
-await client.connect();
+await client.connect()
 //fermeture
-await client.end();
+await client.end()
 ```
 
-Faire une requête
+Faire une requête :
 
 ```tsx
 const {rows} = await client.query<User>(`SELECT id,
@@ -97,21 +97,21 @@ const {rows} = await client.query<User>(`SELECT id,
 
 ### POOL de connexions
 
-Maintenir une connexion est couteux en ressource et difficile à gérer. Dans une application il est parfois nécessaire d’avoir de multiples connexions pour que l’application soit efficace.
+Maintenir une connexion est coûteux en ressources et difficile à gérer. Dans une application, il est parfois nécessaire d’avoir de multiples connexions pour que l’application soit efficace.
 
 Un pool de connexions est un mécanisme qui gère efficacement les connexions à une base de données en maintenant un ensemble de connexions ouvertes pour être réutilisées par différentes requêtes. Cela évite le coût de créer et fermer une nouvelle connexion à chaque requête, améliorant ainsi les performances de l'application. Il permet aussi de limiter et d'optimiser l'utilisation des ressources en contrôlant le nombre de connexions simultanées.
 
 ### Initialisation de la BDD
 
-Comme nous BDD est vierge, nous allons créer une table `Todo` avec des données pour voir faire des requêtes SQL dessus. Pour cela dans le dossier `src/db/scripts` il y a des scripts utils pour gerer cela.
+Comme notre BDD est vierge, nous allons créer une table `Todo` avec des données pour pouvoir faire des requêtes SQL dessus. Pour cela, dans le dossier `src/db/scripts` il y a des scripts utiles pour gérer cela.
 
-- `create-tables.sql` : Permet de créer des tables
-- `seed.sql` : Permet d’insérer des données
-- `drop.sql` : Permet supprimer toutes les tables
+- `create-tables.sql` : Permet de créer des tables.
+- `seed.sql` : Permet d’insérer des données.
+- `drop.sql` : Permet de supprimer toutes les tables.
 
-Nous en ajouterons d’autres par la suite
+Nous en ajouterons d’autres par la suite.
 
-Pour commencer ajoutons des `Todos`
+Pour commencer, ajoutons des `Todos`
 
 ```sql
 CREATE TABLE Todo (
@@ -136,23 +136,23 @@ INSERT INTO Todo (title, isCompleted, createdAt, updatedAt) VALUES
 ```
 
 <aside>
-💡 Cette requête fonctionne en local ou sur Vercel
+💡 Cette requête fonctionne en local ou sur `Vercel`
 
 </aside>
 
-Dans cet exercice nous allons essayer les deux approche : En local et en hébergé sur `Vercel`. Une fois la connexion etablie sur un server. Le reste des exercices devraient être transparent
+Dans cet exercice, nous allons essayer les deux approches : En local et en hébergé sur `Vercel`. Une fois la connexion établie sur un serveur. Le reste des exercices devrait être transparents.
 
 ## Exercice
 
-### Base de données local
+### Base de données locale
 
-Dans cet exercice tu vas devoir créer un client qui va se connecter vers la base de données et récupérer les `Todo`. Tu vas devoir
+Dans cet exercice, tu vas devoir créer un client qui va se connecter vers la base de données et récupérer les `Todo`. Tu vas devoir :
 
-- Utilise le client `pg`,
-- créer une instance
-- Ouvrir la connexion
-- Exécuter la requête SQL
-- Fermer la connexion
+- Utiliser le client `pg`
+- Créer une instance.
+- Ouvrir la connexion.
+- Exécuter la requête SQL.
+- Fermer la connexion.
 
 ```tsx
 import {Client} from 'pg'
@@ -168,21 +168,21 @@ Fichiers
 
 Il est préférable d’utiliser un pool de connexion pour plus de simplicité et d’efficacité.
 
-Notre librairie nous permet de gérer cela avec
+Notre librairie nous permet de gérer cela avec :
 
 ```tsx
 import {Pool} from 'pg'
 
 const pool = new Pool({
-    connectionString:
-      'postgres://postgres:postgres@localhost:5432/postgres?sslmode=disable',
-  })
+  connectionString:
+    'postgres://postgres:postgres@localhost:5432/postgres?sslmode=disable',
+})
 ```
 
 **🐶** Adapte le code pour utiliser un Pool de connexion
 
-- instancie `new Pool`
-- Supprime les connexions et déconnections car ils ne sont plus utiles
+- Instancie `new Pool`
+- Supprime les connexions et déconnections car elles ne sont plus utiles
 
 Fichiers
 
@@ -190,7 +190,7 @@ Fichiers
 
 ### 2. 🚀 Faire la même chose avec Vercel Postgree
 
-Si ta base de données est sur `Vercel` il va falloir utiliser la librairie vercel et creer un Pool Vercel
+Si ta base de données est sur `Vercel`, il va falloir utiliser la librairie `Vercel` et créer un `Pool Vercel` :
 
 ```tsx
 import {createPool} from '@vercel/postgres'
@@ -201,7 +201,7 @@ const pool = createPool({
 })
 ```
 
-Au lieu d’utiliser
+Au lieu d’utiliser :
 
 ```tsx
 //pg
@@ -215,41 +215,43 @@ Fichiers
 
 - `exercise/client-pool/page`
 
-### 2. 🚀 Variables d’environnement
+### 3. 🚀 Variables d’environnement
 
 Les adresses de connexions aux serveurs de base de données varient en fonction de l’environnement
 
-- developpement
-- production
-- test
+- Développement.
+- Production.
+- Test.
 
-Il n’est donc pas conseiller de mettre les informations de connexion dans le code (cela pose également des problèmes de sécurité).
+Il n’est donc pas conseillé de mettre les informations de connexion dans le code (cela pose également des problèmes de sécurité).
 
-A la place nous utilisons des variables d’environnements.
+À la place, nous utilisons des variables d’environnements :
 
 - `.env.development`
 - `.env.production`
 
-### Ordre de priorité des fichiers `.env` dans Next.js :
+### Ordre de priorité des fichiers `.env` dans `Next.js` :
 
-1. **.env.local** : Ce fichier est toujours chargé, quelle que soit l'environnement (`development`, `production`, etc.). Il est utile pour stocker des variables d'environnement spécifiques à la machine locale, et ce fichier est généralement ignoré par Git.
+1. **.env.local** : Ce fichier est toujours chargé, quel que soit l'environnement (`development`, `production`, etc.). Il est utile pour stocker des variables d'environnement spécifiques à la machine locale, et ce fichier est généralement ignoré par Git.
 2. **.env.development** : Ce fichier est chargé uniquement en mode développement (`next dev`). Il contient des variables d'environnement spécifiques au développement.
 3. **.env.production** : Ce fichier est chargé uniquement en mode production (`next start`). Il contient des variables d'environnement spécifiques à la production.
 4. **.env.test** : Ce fichier est chargé uniquement en mode test (`next test` ou lors de l'exécution de tests).
-5. **.env** : Ce fichier est une sorte de "fallback" pour toutes les configurations. S'il n'existe pas de fichier spécifique à l'environnement actuel, Next.js utilisera les variables définies dans ce fichier.
+5. **.env** : Ce fichier est une sorte de `"fallback"` pour toutes les configurations. S'il n'existe pas de fichier spécifique à l'environnement actuel, `Next.js` utilisera les variables définies dans ce fichier.
 
 <aside>
-💡 La priorité est toujours faite à la variable d’environnement présente sur la machine
+💡 La priorité est toujours faite à la variable d’environnement présente sur la machine.
 
 </aside>
 
-**🐶 Dans cet exercice adapte le code pour qu’il utilise la bonne variable d’environnement et modifie les fichier .env pour contenir la connexion a ta base de données.**
+**🐶** Dans cet exercice, adapte le code pour qu’il utilise la bonne variable d’environnement et modifie **les** fichiers **`.env`** pour contenir la connexion à ta base de données.
 
 Fichiers
 
 - `exercise/client-pool/page`
 - `.env.development`
 - `.env.production`
+
+PS : `Vercel` détectera automatiquement les variables `POSTGRES_URL` et créera le bon pool
 
 ## Aller plus loin
 
@@ -265,4 +267,4 @@ Fichiers
 
 ## 🐜 Feedback
 
-Remplir le formulaire le [formulaire de FeedBack](https://go.mikecodeur.com/cours-next-avis?entry.1912869708=Next%20PRO&entry.1430994900=Data%20Modeling&entry.533578441=01%20Client%20Pool).
+Remplir le formulaire le [formulaire de FeedBack](https://go.mikecodeur.com/cours-next-avis?entry.1912869708=Next%20PRO&entry.1430994900=06.Data%20Modeling&entry.533578441=01%20Client%20Pool).
