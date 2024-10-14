@@ -4,28 +4,28 @@
 
 ## 📝 Tes notes
 
-Detaille ce que tu as appris ici, sur une page [Notion](https://go.mikecodeur.com/course-notes-template)
+Détaille ce que tu as appris ici, sur une page [Notion](https://go.mikecodeur.com/course-notes-template)
 
 ## Comprendre
 
-Lorsque l’on développe et surtout avec des bases de données, il y a énormément de contraintes a respecter (tables correctement définies, types, contraintes, jeux de données).
+Lorsque l’on développe et surtout avec des bases de données, il y a énormément de contraintes à respecter (tables correctement définies, types, contraintes, jeux de données).
 
-En tant que développeur on peut vite se retrouver dans des états incohérents.
+En tant que développeur, on peut vite se retrouver dans des états incohérents.
 
-Il est important d’avoir des script permettant facilement de
+Il est important d’avoir des script permettant facilement de :
 
-- Supprimer toutes les tables et contraintes
-- Créer toute les tables
-- Insérer un jeux de données
+- Supprimer toutes les tables et contraintes.
+- Créer toutes les tables.
+- Insérer un jeu de données.
 
-On parle généralement de
+On parle généralement de :
 
-- DDL (Data Definition Language) - exemple : `create-tables.sql` ,`drop.sql`
-- DML (Data Manipulation Language) exemple : `seed.sql`
+- `DDL` (`Data Definition Language`) - Exemple : `create-tables.sql` ,`drop.sql`
+- `DML` (`Data Manipulation Language`) - Exemple : `seed.sql`
 
-Pour le moment il nous faut aller dans l’interface de postgres (PgAdmin ou sur Vercel) pour executer manuellement les requêtes. Cela peut vite devenir compliqué.
+Pour le moment, il nous faut aller dans l’interface de `Postgres` (`PgAdmin` ou sur `Vercel`) pour exécuter manuellement les requêtes. Cela peut vite devenir compliqué.
 
-Pour simplifier nous allons creer des script accessible dans le `package.json`
+Pour simplifier, nous allons créer des scripts accessibles dans le `package.json`
 
 ```json
 "db:check": "tsx src/db/scripts/check.ts", // check accès DB
@@ -34,16 +34,16 @@ Pour simplifier nous allons creer des script accessible dans le `package.json`
 "db:seed": "tsx src/db/scripts/seed.ts", // insere des données
 ```
 
-Pour pouvoir exécuter des scripts `TypeScript` Independent de Next, il existe TSX
+Pour pouvoir exécuter des scripts `TypeScript` indépendant de `Next`, il existe `TSX`.
 
-📑 Le liens vers la doc TSX [https://www.npmjs.com/package/tsx](https://www.npmjs.com/package/tsx)
+📑 Le lien vers la doc TSX [https://www.npmjs.com/package/tsx](https://www.npmjs.com/package/tsx)
 
 ```bash
 # execution du script ts check
 tsx src/db/scripts/check.ts
 ```
 
-Comme nous l’exécution est indépendante de Next, il n’y a aucun mécanisme permettant de gérer les fichiers `.env.` Nous allons donc utiliser `'dotenv’` qui permet de gérer cela.
+Comme l’exécution est indépendante de `Next`, il n’y a aucun mécanisme permettant de gérer les fichiers `.env`. Nous allons donc utiliser `'dotenv’` qui permet de gérer cela.
 
 ```tsx
 //env.ts
@@ -57,14 +57,13 @@ function initDotEnv() {
 }
 
 export default initDotEnv
-
 ```
 
 ## Exercice
 
-Dans cet exercice tu vas devoir implémenter le script de remplissage de données `Todo` : `seed.ts`
+Dans cet exercice, tu vas devoir implémenter le script de remplissage de données `Todo` : `seed.ts`
 
-PS : Attention lors de la manipulation de données en production
+PS : Attention lors de la manipulation de données en production.
 
 Tu peux exécuter un cycle complet : `DROP / CREATE / SEED avec la commande`
 
@@ -86,4 +85,4 @@ Fichiers
 
 ## 🐜 Feedback
 
-Remplir le formulaire le [formulaire de FeedBack](https://go.mikecodeur.com/cours-next-avis?entry.1912869708=Next%20PRO&entry.1430994900=Data%20Modeling&entry.533578441=02%20Les%20scripts).
+Remplir le formulaire le [formulaire de FeedBack](https://go.mikecodeur.com/cours-next-avis?entry.1912869708=Next%20PRO&entry.1430994900=06.Data%20Modeling&entry.533578441=02%20Les%20scripts).

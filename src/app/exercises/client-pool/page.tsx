@@ -5,7 +5,7 @@ export const fetchCache = 'force-no-store'
 
 const pool = createPool({
   connectionString:
-    // 🐶 Remplace les informations de connexion par celles de ton compte Vercel
+    // 🐶 Remplace les informations de connexion par celles de ton compte `Vercel`
     process.env.POSTGRES_URL,
 })
 
