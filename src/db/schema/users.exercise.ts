@@ -15,14 +15,14 @@ export const users = pgTable('users', {
 
 export const profileInfo = pgTable('profile_info', {
   id: serial('id').primaryKey(),
-  // ⛏️ modifie 'userId' pour ajouter une référence à la table users
+  // ⛏️ Modifie `userId` pour ajouter une référence à la table `users`
   //.references(() => users.id), permet de créer une relation entre les deux tables
   userId: integer('user_id'),
   note: varchar('note', {length: 255}),
   metadata: jsonb('metadata'),
 })
 
-// 🐶 créé la relation 'usersRelations' entre 'user' et 'profileInfo'
+// 🐶 Crée la relation `usersRelations` entre `user` et `profileInfo`
 const usersRelations = relations(users, ({one}) => ({
   // profileInfo: one(profileInfo, {
   //   fields: [users.id],
@@ -30,7 +30,7 @@ const usersRelations = relations(users, ({one}) => ({
   // }),
 }))
 
-// 🐶 créé la relation 'profileInfoRelations' entre 'profileInfo' et 'user'
+// 🐶 Crée la relation `profileInfoRelations` entre `profileInfo` et `user`
 const profileInfoRelations = relations(profileInfo, ({one}) => ({
   // user: one(users, {
   //   fields: [profileInfo.userId],
@@ -38,6 +38,6 @@ const profileInfoRelations = relations(profileInfo, ({one}) => ({
   // }),
 }))
 
-// 🐶 pourquoi nous devons referencer dans les 2 sens ?
+// 🐶 Pourquoi nous devons référencer dans les 2 sens ?
 //https://github.com/drizzle-team/drizzle-orm-docs/issues/335
 //https://github.com/drizzle-team/drizzle-orm-docs/pull/336

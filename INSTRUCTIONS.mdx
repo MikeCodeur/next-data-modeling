@@ -4,11 +4,11 @@
 
 ## 📝 Tes notes
 
-Detaille ce que tu as appris ici, sur une page [Notion](https://go.mikecodeur.com/course-notes-template)
+Détaille ce que tu as appris ici, sur une page [Notion](https://go.mikecodeur.com/course-notes-template)
 
 ## Comprendre
 
-Rappel
+Rappel :
 
 Voici un bref rappel des types de relations en bases de données relationnelles :
 
@@ -16,7 +16,7 @@ Voici un bref rappel des types de relations en bases de données relationnelles 
 
 - **Description** : Chaque enregistrement dans une table A correspond à un seul enregistrement dans une table B, et vice versa.
 - **Exemple** : Un utilisateur (`users`) et son profil détaillé (`user_profiles`). Chaque utilisateur a un profil unique.
-- **Implémentation** : Utilisation d'une clé étrangère (foreign key) avec une contrainte d'unicité (`UNIQUE`) dans l'une des tables.
+- **Implémentation** : Utilisation d'une clé étrangère (`foreign key`) avec une contrainte d'unicité (`UNIQUE`) dans l'une des tables.
 
 ### 2. Relation **1-N** (One-to-Many)
 
@@ -30,7 +30,7 @@ Voici un bref rappel des types de relations en bases de données relationnelles 
 - **Exemple** : Les étudiants (`students`) et les cours (`courses`). Un étudiant peut suivre plusieurs cours, et un cours peut être suivi par plusieurs étudiants.
 - **Implémentation** : Création d'une table de jonction (ou d'association) avec deux clés étrangères, une pointant vers la table A et l'autre vers la table B.
 
-Pour créer des relation en SQL il faut plusieurs tables contenant chacune une `PK (Primary Key)`. La liaison se fait via un clef étrangère, `FK (Foreign Key)`. On utilise `REFERENCES` pour définir la FK. Exemple :
+Pour créer des relations en SQL, il faut plusieurs tables contenant chacune une `PK (Primary Key)`. La liaison se fait via une clef étrangère, `FK (Foreign Key)`. On utilise `REFERENCES` pour définir la `FK`. Exemple :
 
 ```sql
 CREATE TABLE users (
@@ -46,16 +46,16 @@ CREATE TABLE orders (
 );
 ```
 
-### Drizzle : relation / références
+### Drizzle : Relation / Références
 
 Pour définir des relations avec `Drizzle` nous avons besoin de 2 choses :
 
 - Définir les FK (avec `references`), cela applique les contraintes sur la BDD
   - Doc : https://orm.drizzle.team/docs/rqb#foreign-keys
-- Définir les Relation (Au niveau applicatif avec `relation`)
+- Définir les Relations (Au niveau applicatif avec `relation`)
   - Doc : https://orm.drizzle.team/docs/rqb#one-to-one
 
-Exemple de définition de relation 1-1
+Exemple de définition de relation 1-1 :
 
 ```tsx
 import { pgTable, serial, text, integer, boolean } from 'drizzle-orm/pg-core';
@@ -82,13 +82,13 @@ export const usersRelations = relations(users, ({ one, many }) => ({
 
 ```
 
-📑 Le liens vers la doc [https://fr.reactjs.org/docs/getting-started.html](https://fr.reactjs.org/docs/getting-started.html)
+📑 Le lien vers la doc [https://fr.reactjs.org/docs/getting-started.html](https://fr.reactjs.org/docs/getting-started.html)
 
-Des frameworks JavaScript modernes ont donc été créés pour relever certains des défis en créant par programme le DOM plutôt que de le définir à la main HTML.
+Des frameworks `JavaScript` modernes ont donc été créés pour relever certains des défis en créant par programme le `DOM` plutôt que de le définir à la main `HTML`.
 
 ## Exercice
 
-**🐶D**ans cet exercice tu vas devoir créer une relation 1-1 entre `USER` et `PROFILEINFO`
+**🐶** Dans cet exercice, tu vas devoir créer une relation 1-1 entre `USER` et `PROFILEINFO`
 
 Fichiers
 
@@ -98,9 +98,9 @@ Fichiers
 
 ### 1. 🚀 Query
 
-La puissance de l’ORM réside également dans le fait que lorsque l’on définis correctement les relations, il est très simple d’accéder aux données ainsi que les données associé au lieu d’avoir a faire plusieurs requêtes SQL séparés ou une grosse requêtes complexe avec des jointures.
+La puissance de l’`ORM` réside également dans le fait que lorsque l’on définit correctement les relations, il est très simple d’accéder aux données ainsi que les données associées au lieu d’avoir à faire plusieurs requêtes SQL séparées ou une grosse requête complexe avec des jointures.
 
-**🐶** Dans cet exercice tu vas appeler `USER` et demander d’avoir le profil avec pour afficher la note
+**🐶** Dans cet exercice bonus, tu vas appeler `USER` et demander d’avoir le profil avec pour afficher la note.
 
 📑 Le lien vers la doc [https://orm.drizzle.team/docs/rqb](https://orm.drizzle.team/docs/rqb)
 
@@ -122,4 +122,4 @@ Fichiers
 
 ## 🐜 Feedback
 
-Remplir le formulaire le [formulaire de FeedBack](https://go.mikecodeur.com/cours-next-avis?entry.1912869708=Next%20PRO&entry.1430994900=Data%20Modeling&entry.533578441=06%20Relation%201-1).
+Remplir le formulaire le [formulaire de FeedBack](https://go.mikecodeur.com/cours-next-avis?entry.1912869708=Next%20PRO&entry.1430994900=06.Data%20Modeling&entry.533578441=06%20Relation%20One%20To%20One).
