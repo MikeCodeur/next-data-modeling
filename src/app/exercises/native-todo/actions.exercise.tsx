@@ -2,16 +2,16 @@
 
 import {AddTodo, Todo} from '@/lib/type'
 import {revalidatePath} from 'next/cache'
-// 🐶 Importe createPool
+// 🐶 Importe `createPool`
 // 🤖 import {createPool} from '@vercel/postgres'
 
-// 🐶 Crée une instance de pool
+// 🐶 Crée une instance de `pool`
 // 🤖 const pool = createPool ...
 
 export const addTodo = async (todo: AddTodo) => {
   console.log('add todo action', todo)
   try {
-    // 🐶 va dans 'addTodoDao' pour implementer la fonction
+    // 🐶 Vas dans `addTodoDao` pour implémenter la fonction
     await addTodoDao(todo)
   } catch (error) {
     console.error('Failed to add todo', error)
@@ -23,7 +23,7 @@ export const addTodo = async (todo: AddTodo) => {
 
 export const updateTodo = async (todo: Todo) => {
   try {
-    // 🐶 va dans 'updateTodoDao' pour implementer la fonction
+    // 🐶 Vas dans `updateTodoDao` pour implémenter la fonction
     await updateTodoDao(todo)
   } catch (error) {
     console.error('Failed to update todo', error)
@@ -35,21 +35,21 @@ export const updateTodo = async (todo: Todo) => {
 
 export async function addTodoDao(todo: AddTodo): Promise<void> {
   console.log('addTodoDao', todo)
-  // 🐶 Implemente la fonction
+  // 🐶 Implémente la fonction
   //
-  /* La requete SQL
+  /* La requête SQL
     INSERT INTO Todo (title, isCompleted, createdAt, updatedAt) VALUES ('Un Todo', false, NOW(), NOW())
   */
 
-  // 🐶 utilise 'pool.sql' pour executer la requete
+  // 🐶 Utilise `pool.sql` pour exécuter la requête
   // 🤖 await pool.sql`...`
 }
 
 export async function updateTodoDao(todo: Todo): Promise<void> {
   console.log('updateTodoDao', todo)
-  // 🐶 Implemente la fonction
+  // 🐶 Implémente la fonction
   //
-  /* La requete SQL
+  /* La requête SQL
    UPDATE Todo
     SET
       title = 'Todo updated',
@@ -58,7 +58,7 @@ export async function updateTodoDao(todo: Todo): Promise<void> {
     WHERE id = 10
   */
 
-  // 🐶 utilise 'pool.sql' pour executer la requete
+  // 🐶 Utilise `pool.sql` pour exécuter la requête
   // 🤖 await pool.sql`...`
 }
 
@@ -73,9 +73,9 @@ export async function getTodos(): Promise<Todo[]> {
       updatedAt: new Date(),
     },
   ]
-  // 🐶 Implemente la fonction
+  // 🐶 Implémente la fonction
 
-  /* La requete SQL
+  /* La requête SQL
   SELECT id,
   title,
   iscompleted AS "isCompleted",

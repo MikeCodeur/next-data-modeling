@@ -1,28 +1,28 @@
-# Construire un app en SQL Natif
+# Construire une app en SQL Natif
 
 ### 💡 Comprendre la complexité
 
 ## 📝 Tes notes
 
-Detaille ce que tu as appris ici, sur une page [Notion](https://go.mikecodeur.com/course-notes-template)
+Détaille ce que tu as appris ici, sur une page [Notion](https://go.mikecodeur.com/course-notes-template)
 
 ## Comprendre
 
-Dans les exercice précèdent nous avons récupérer les données `Todo` depuis la BDD. Maintenant si nous voulons gérer une `TodoList`, il va falloir gérer des fonctions de création / mise à jour.
+Dans les exercices précédents, nous avons récupéré les données `Todo` depuis la BDD. Maintenant, si nous voulons gérer une `TodoList`, il va falloir gérer des fonctions de création / mise à jour.
 
-- La première étape consiste à créer les requêtes SQL
-- Exécuter ces requêtes
+- La première étape consiste à créer les requêtes SQL.
+- Exécuter ces requêtes.
 
-Nous allons reprendre la `TodoList` que nous avons vu dans les modules précédents et nous allons appeler notre base de données pour la création et mise a jour.
+Nous allons reprendre la `TodoList` que nous avons vue dans les modules précédents et nous allons appeler notre base de données pour la création et la mise à jour.
 
-- Requête d’insertion
+- Requête d’insertion :
 
 ```sql
 INSERT INTO Todo (title, isCompleted, createdAt, updatedAt)
 VALUES ('Un Todo', false, NOW(), NOW())
 ```
 
-- Requête de mise a jour
+- Requête de la mise à jour :
 
 ```sql
 UPDATE Todo
@@ -35,21 +35,17 @@ UPDATE Todo
 
 ## Exercice
 
-Tu cet exercice tu vas devoir implémenter la création et la mise à jour d’un `Todo`. Notre TodoList fait appel au `Server Action`. Pour le moment les fonctions du server action sont vide.
+Dans cet exercice, tu vas devoir implémenter la création et la mise à jour d’un `Todo`. Notre `TodoList` fait appel au `Server Action`. Pour le moment, les fonctions du `server action` sont vides.
 
-**🐶 Implémente**
+**🐶 Implémente :**
 
 - **`addTodoDao`**
 - `updateTodoDao`
 - `getTodos`
 
-T
-
 Fichiers
 
 - `exercises/native-todo/action`
-
-##
 
 ## Ils vont t’aider
 
@@ -61,4 +57,4 @@ Fichiers
 
 ## 🐜 Feedback
 
-Remplir le formulaire le [formulaire de FeedBack](https://go.mikecodeur.com/cours-next-avis?entry.1912869708=Next%20PRO&entry.1430994900=Data%20Modeling&entry.533578441=03%20Native%20SQL).
+Remplir le formulaire le [formulaire de FeedBack](https://go.mikecodeur.com/cours-next-avis?entry.1912869708=Next%20PRO&entry.1430994900=06.Data%20Modeling&entry.533578441=03%20Native%20SQL).
