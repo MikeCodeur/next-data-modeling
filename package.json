@@ -38,7 +38,7 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "dotenv": "^16.4.5",
-    "drizzle-orm": "^0.33.0",
+    "drizzle-orm": "^0.35.2",
     "lowdb": "^7.0.1",
     "lucide-react": "^0.368.0",
     "next": "14.2.4",
@@ -59,7 +59,7 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@mikecodeur/course-app-cli": "^1.0.19",
+    "@mikecodeur/course-app-cli": "^1.0.23",
     "@types/node": "^20.16.1",
     "@types/pg": "^8.11.6",
     "@types/react": "^18.3.3",
@@ -67,7 +67,7 @@
     "@typescript-eslint/eslint-plugin": "^7.18.0",
     "@typescript-eslint/parser": "^7.18.0",
     "autoprefixer": "^10.4.20",
-    "drizzle-kit": "^0.24.0",
+    "drizzle-kit": "^0.26.2",
     "eslint": "^8.57.0",
     "eslint-config-next": "14.2.1",
     "eslint-config-prettier": "^9.1.0",
