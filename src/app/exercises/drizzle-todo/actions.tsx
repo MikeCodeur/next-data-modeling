@@ -1,7 +1,7 @@
 'use server'
 
 import {revalidatePath} from 'next/cache'
-import {AddTodo, Todo, todos} from '@/db/schema/todos.final'
+import {AddTodo, Todo, todos} from '@/db/schema/todos'
 import {asc, eq} from 'drizzle-orm'
 import db from '@/db/schema'
 
