@@ -1,7 +1,7 @@
 import {Todo} from '@/lib/type'
 import {createPool} from '@vercel/postgres'
 
-export const fetchCache = 'force-no-store'
+export const revalidate = 0
 
 const pool = createPool({
   connectionString:

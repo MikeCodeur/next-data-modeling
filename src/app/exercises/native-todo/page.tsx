@@ -2,7 +2,7 @@
 import {getTodos} from './actions'
 import Todos from './todos-view'
 
-export const fetchCache = 'force-no-store'
+export const revalidate = 0
 const Page = async () => {
   const todos = await getTodos()
   return (
