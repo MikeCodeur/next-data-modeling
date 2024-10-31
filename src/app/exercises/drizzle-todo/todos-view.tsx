@@ -8,7 +8,7 @@ import {toast} from 'sonner'
 
 import React, {startTransition, useOptimistic} from 'react'
 import {addTodo as AddTodoAction} from './actions'
-import {Todo} from '@/db/schema/todos.final'
+import {Todo} from '@/db/schema/todos'
 import {ne} from 'drizzle-orm'
 
 interface TodosProps {
