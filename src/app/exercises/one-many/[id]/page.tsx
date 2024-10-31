@@ -2,7 +2,8 @@ import {ProductWithCategory} from '@/db/schema/products'
 import {getCategoriesByIdWithProducts} from '../actions'
 import {ProductsTable} from './product-table'
 
-export default async function Page({params}: {params: {id: string}}) {
+export default async function Page(props: {params: Promise<{id: string}>}) {
+  const params = await props.params
   const category = await getCategoriesByIdWithProducts(Number(params.id))
   const products = category?.products
   console.log('products', products)

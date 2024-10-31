@@ -12,7 +12,8 @@ import {ProductsManagement} from './products-management'
 
 //export const fetchCache = 'force-no-store'
 
-export default async function Page({params}: {params: {page: string}}) {
+export default async function Page(props: {params: Promise<{page: string}>}) {
+  const params = await props.params
   const {page} = params
   const currentPage = parseInt(page, 10) || 1
   const nbElement = 4 // Nombre d'éléments par page
