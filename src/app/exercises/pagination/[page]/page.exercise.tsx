@@ -10,8 +10,12 @@ import {
 import {getProductsPagination} from './actions'
 import {ProductsManagement} from './products-management'
 
-export default async function Page({params}: {params: {page: string}}) {
-  const {page} = params
+export default async function Page({
+  params,
+}: {
+  params: Promise<{page: string}>
+}) {
+  const {page} = await params
   const currentPage = parseInt(page, 10) || 1
   const nbElement = 4 // Nombre d'éléments par page
   const start = (currentPage - 1) * nbElement
