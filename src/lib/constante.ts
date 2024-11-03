@@ -1,1 +1,1 @@
-export const moduleName = 'Next Modeling'
+export const moduleName = 'Next Data Modeling'
