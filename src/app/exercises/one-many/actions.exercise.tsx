@@ -8,12 +8,12 @@ export async function getCategories() {
   })
   return resultQuery
 }
-// 🐶 Utilise les relation pour recuperer
-// - Les categories avec les produits (contenant eux meme les catégories de produit)
+// 🐶 Utilise les relations pour récupérer
+// - Les categories avec les produits (contenant eux même les catégories de produit)
 export async function getCategoriesByIdWithProducts(catId: number) {
   const resultQuery = await db.query.categories.findFirst({
-    // 🐶 utilise 'with' pour récupérer les produits
-    // 🐶 - utilise 'with' (imbriqué) pour récupérer les catégories
+    // 🐶 Utilise `with` pour récupérer les produits
+    // 🐶 - Utilise `with` (imbriqué) pour récupérer les catégories
     where: catId ? (categories, {eq}) => eq(categories.id, catId) : undefined,
     orderBy: (categories, {asc}) => [asc(categories.id)],
   })
