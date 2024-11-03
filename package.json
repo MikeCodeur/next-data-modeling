@@ -1,5 +1,5 @@
 {
-  "name": "next-course-template",
+  "name": "next-data-modeling",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -59,7 +59,7 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@mikecodeur/course-app-cli": "^1.0.19",
+    "@mikecodeur/course-app-cli": "^1.0.23",
     "@types/node": "^20.16.1",
     "@types/pg": "^8.11.6",
     "@types/react": "npm:types-react@19.0.0-rc.1",

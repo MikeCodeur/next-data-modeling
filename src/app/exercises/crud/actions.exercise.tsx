@@ -10,8 +10,8 @@ export async function getProducts(catId?: number) {
   const resultQuery = await db.query.products.findMany({
     // 🐶 Implémente la requête avec les caractéristiques suivantes :
     // - avec les categories
-    // - où la catégorie est égale à catId
-    // - trié par id ascendant
+    // - où la catégorie est égale à `catId`
+    // - trié par `id` ascendant
     // - limité à 20
   })
 
@@ -21,7 +21,7 @@ export async function getProducts(catId?: number) {
 export async function getCategories() {
   const resultQuery = await db.query.categories.findMany({
     // 🐶 Implémente la requête avec les caractéristiques suivantes :
-    // - trié par id ascendant
+    // - trié par `id` ascendant
   })
   return resultQuery
 }
@@ -31,7 +31,7 @@ export async function getProductByName(name: string) {
     // 🐶 Implémente la requête avec les caractéristiques suivantes :
     // - avec les categories
     // - où le titre est égal à name
-    // - trié par id ascendant
+    // - trié par `id` ascendant
   })
 
   return resultQuery
@@ -39,18 +39,18 @@ export async function getProductByName(name: string) {
 
 export async function deleteProductDao(id: number) {
   // 🐶 Implémente la requête avec les caractéristiques suivantes :
-  // - supprime le produit où l'id est égal à id
+  // - supprime le produit où l'id est égal à `id`
   // - retourne le résultat
 }
 
 export async function insertProductDao(product: InsertProduct) {
   // 🐶 Implémente la requête avec les caractéristiques suivantes :
-  // - insère le produit dans la table products
+  // - insère le produit dans la table `products`
   // - retourne le résultat
 }
 export async function updateProductDao(product: Product) {
   // 🐶 Implémente la requête avec les caractéristiques suivantes :
-  // - met à jour le produit dans la table products
+  // - mets à jour le produit dans la table `products`
   // - où l'id est égal à product.id
   // - retourne le résultat
 }
