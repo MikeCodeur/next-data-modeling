@@ -15,9 +15,9 @@ Nous allons voir maintenant comment Créer, Mettre à jour et supprimer des donn
 **1 : Création de données**
 
 ```tsx
-await db.insert(users).values({ name: 'Andrew' });
+await db.insert(users).values({name: 'Andrew'})
 // multiple row
-await db.insert(users).values([{ name: 'Andrew' }, { name: 'Dan' }]);
+await db.insert(users).values([{name: 'Andrew'}, {name: 'Dan'}])
 ```
 
 📑 Le liens vers la doc https://orm.drizzle.team/docs/insert#insert-one-row
@@ -25,9 +25,7 @@ await db.insert(users).values([{ name: 'Andrew' }, { name: 'Dan' }]);
 **2 : Mise à jour**
 
 ```tsx
-await db.update(users)
-  .set({ name: 'Mr. Dan' })
-  .where(eq(users.name, 'Dan'));
+await db.update(users).set({name: 'Mr. Dan'}).where(eq(users.name, 'Dan'))
 ```
 
 📑 Le liens vers la doc https://orm.drizzle.team/docs/update
@@ -35,7 +33,7 @@ await db.update(users)
 **3 : Suppression**
 
 ```tsx
-await db.delete(users).where(eq(users.name, 'Dan'));
+await db.delete(users).where(eq(users.name, 'Dan'))
 ```
 
 📑 Le liens vers la doc https://orm.drizzle.team/docs/delete
@@ -104,9 +102,10 @@ Doc : https://orm.drizzle.team/docs/insert#on-conflict-do-update
 Pour fonctionner on utiliser un `insert` + `onConflictDoUpdate`
 
 ```tsx
-await db.insert(users)
-  .values({ id: 1, name: 'Dan' })
-  .onConflictDoUpdate({ target: users.id, set: { name: 'John' } });
+await db
+  .insert(users)
+  .values({id: 1, name: 'Dan'})
+  .onConflictDoUpdate({target: users.id, set: {name: 'John'}})
 ```
 
 - **🐶 Adapte la fonction `persistProductDao` en utilisant cette technique**
