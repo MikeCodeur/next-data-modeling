@@ -3,6 +3,7 @@ import Link from 'next/link'
 import {PropsWithChildren} from 'react'
 
 import {ModeToggle} from '@/components/theme-toggle'
+import {moduleName} from '@/lib/constante'
 
 import RenderTime from '@/components/render-time'
 
@@ -18,10 +19,7 @@ export default function AppLayout({children}: PropsWithChildren) {
         <div className="container px-4 sm:px-6 lg:px-8">
           <nav className="flex h-14 items-center justify-between">
             <div className="flex items-center space-x-4">
-              <Link
-                className="flex items-center space-x-2 font-bold"
-                href="/exercises"
-              >
+              <Link className="flex items-center space-x-2 font-bold" href="/">
                 <span>Home</span>
               </Link>
 
@@ -73,7 +71,7 @@ export default function AppLayout({children}: PropsWithChildren) {
             <div className="flex items-center space-x-2">
               <Link
                 className="text-sm font-semibold underline sm:hidden"
-                href="/exercises"
+                href="/"
               >
                 Home
               </Link>
@@ -94,7 +92,7 @@ export default function AppLayout({children}: PropsWithChildren) {
       <footer className="border-t">
         <div className="container flex h-14 items-center justify-center px-4 text-center sm:px-6 lg:px-8">
           <div className="mx-auto max-w-4xl">
-            © {new Date().getFullYear()} Next Module . All rights reserved.{' '}
+            © {new Date().getFullYear()} {moduleName} . All rights reserved.{' '}
             <RenderTime name="exercices main layout" />
           </div>
         </div>
