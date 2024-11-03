@@ -26,7 +26,7 @@ export default async function Page(props: {params: Promise<{page: string}>}) {
 
   const maxPagesToShow = 5 // Maximum number of pagination links to show
 
-  // Determine the start and end page numbers
+  // Détermine the start and end page numbers
   let startPage = Math.max(currentPage - Math.floor(maxPagesToShow / 2), 1)
   let endPage = startPage + maxPagesToShow - 1
 

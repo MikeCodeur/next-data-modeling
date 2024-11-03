@@ -5,24 +5,24 @@ import {formSchema, FormSchemaType} from './schema'
 import {revalidatePath} from 'next/cache'
 import {Product, products, ProductWithCategory} from '@/db/schema/products'
 import {asc, count, eq} from 'drizzle-orm'
-// 🐶 Importe le type 'PgSelect' de 'drizzle-orm/pg-core/query-builders'
+// 🐶 Importe le type `PgSelect` de `drizzle-orm/pg-core/query-builders`
 
 // 🤖 import {PgSelect} from 'drizzle-orm/pg-core/query-builders'
 import {categories, Category} from '@/db/schema/categories'
 
-// 🐶 le type générique 'T' doit étendre 'PgSelect'
+// 🐶 Le type générique `T` doit étendre `PgSelect`
 function withPagination<T>(
   qb: T
-  // 🐶 Ajoute une 'page' et une 'pageSize' en paramètres
+  // 🐶 Ajoute une `page` et une `pageSize` en paramètres
 ) {
-  // 🐶 Implémente une 'limit' et un 'offset' pour gérer la pagination
+  // 🐶 Implémente une `limit` et un `offset` pour gérer la pagination
   return qb
 }
 // 🐶 Transfome cette fonction en utilisant les Dynamic Query
 export async function getProductsPagination(nbElement: number, start: number) {
-  // 🐶 Transforme cette requete 'Query' en 'PgSelect'
+  // 🐶 Transforme cette requête `Query` en `PgSelect`
   // 🤖 const query = db.select().from(products) ...
-  // 🐶 pense a utiliser une jointure vers category
+  // 🐶 Pense à utiliser une jointure vers `category`
   // 🤖 .leftJoin(categories, eq(categories.id, products.category))
   const query = await db.query.products.findMany({
     offset: start,
@@ -33,15 +33,15 @@ export async function getProductsPagination(nbElement: number, start: number) {
     orderBy: (product, {asc}) => [asc(product.id)],
   })
 
-  // 🐶 Rend cette requete dynamique avec '$dynamic'
+  // 🐶 Rends cette requête dynamique avec `$dynamic`
   // 🤖 const dynamicQuery = query.$dynamic()
 
-  // 🐶 Utilise 'withPagination'
+  // 🐶 Utilise `withPagination`
   // 🤖 const resultQuery = ...
 
   const rows = await db.select({count: count()}).from(products)
 
-  // 🐶 Transforme les données 'product' pour les rendre plus lisibles grace à
+  // 🐶 Transforme les données `product` pour les rendre plus lisibles grâce à
   // 🤖 transformFlattenedData(resultQuery as FlattenedData[]),
   return {
     products: query, //transformFlattenedData(resultQuery as FlattenedData[]),
