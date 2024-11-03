@@ -27,38 +27,44 @@ Oui mais l’opération l’étape 2 **Débit du compte client,** à déjà ét�
 async function processOrder() {
   try {
     // 1. Vérification du stock
-    const stock = await checkStock(productId);
+    const stock = await checkStock(productId)
     if (stock <= 0) {
-      throw new Error("Produit en rupture de stock");
+      throw new Error('Produit en rupture de stock')
     }
 
     // 2. Débit du compte client
-    const debitSuccess = await debitAccount(accountId, amount);
+    const debitSuccess = await debitAccount(accountId, amount)
     if (!debitSuccess) {
-      throw new Error("Échec du débit du compte client");
+      throw new Error('Échec du débit du compte client')
     }
 
     // 3. Mise à jour du stock
-    const updateStockSuccess = await updateStock(productId);
+    const updateStockSuccess = await updateStock(productId)
     if (!updateStockSuccess) {
       // Problème à l'étape 3, on recrédite le compte
-      await creditAccount(accountId, amount);
-      throw new Error("Échec de la mise à jour du stock. Compte recrédité.");
+      await creditAccount(accountId, amount)
+      throw new Error('Échec de la mise à jour du stock. Compte recrédité.')
     }
 
     // 4. Création de la commande
-    const orderCreated = await createOrder(orderId, productId, accountId, amount);
+    const orderCreated = await createOrder(
+      orderId,
+      productId,
+      accountId,
+      amount
+    )
     if (!orderCreated) {
       // Problème à l'étape 4, on recrédite le compte et on remet le stock
-      await creditAccount(accountId, amount);
-      await restoreStock(productId);
-      throw new Error("Échec de la création de la commande. Compte recrédité et stock restauré.");
+      await creditAccount(accountId, amount)
+      await restoreStock(productId)
+      throw new Error(
+        'Échec de la création de la commande. Compte recrédité et stock restauré.'
+      )
     }
 
-    console.log("Commande traitée avec succès");
-
+    console.log('Commande traitée avec succès')
   } catch (error) {
-    console.error("Erreur lors du traitement de la commande:", error.message);
+    console.error('Erreur lors du traitement de la commande:', error.message)
   }
 }
 ```
@@ -83,9 +89,15 @@ Les transactions s’utilise avec `db.transaction`
 
 ```tsx
 await db.transaction(async (tx) => {
-  await tx.update(accounts).set({ balance: sql`${accounts.balance} - 100.00` }).where(eq(users.name, 'Dan'));
-  await tx.update(accounts).set({ balance: sql`${accounts.balance} + 100.00` }).where(eq(users.name, 'Andrew'));
-});
+  await tx
+    .update(accounts)
+    .set({balance: sql`${accounts.balance} - 100.00`})
+    .where(eq(users.name, 'Dan'))
+  await tx
+    .update(accounts)
+    .set({balance: sql`${accounts.balance} + 100.00`})
+    .where(eq(users.name, 'Andrew'))
+})
 ```
 
 Si une erreur survient sur une des opérations de la transaction, on `rollback`.
@@ -100,10 +112,9 @@ if (account.balance < 100) {
 
 // ou en levant un Error
 if (account.balance < 100) {
-   // This throws an exception that rollbacks the transaction.
-	 throw new Error(`Insufficient funds in ${accountUserId1}'s account`)
+  // This throws an exception that rollbacks the transaction.
+  throw new Error(`Insufficient funds in ${accountUserId1}'s account`)
 }
-
 ```
 
 📑 Le liens vers la doc [https://orm.drizzle.team/docs/transactions](https://orm.drizzle.team/docs/transactions)
@@ -123,7 +134,6 @@ export const accounts = pgTable('accounts', {
     .notNull(),
   blocked: boolean('blocked').default(false),
 })
-
 ```
 
 Nous avons lié `account` à `user`
@@ -213,7 +223,7 @@ Fichiers
 
 ```tsx
 if (!account1 || Number(account1.balance) < amount) {
-   throw new Error(`Insufficient funds in ${accountUserId1}'s account`)
+  throw new Error(`Insufficient funds in ${accountUserId1}'s account`)
 }
 ```
 
@@ -221,7 +231,7 @@ par
 
 ```tsx
 if (!account1 || Number(account1.balance) < amount) {
-   tx.rollback()
+  tx.rollback()
 }
 // Lève une erreur
 // MAIS ne permet pas d'indiquer la cause

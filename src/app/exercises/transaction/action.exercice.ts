@@ -20,7 +20,7 @@ export async function transferFunds(
   amount: number
 ) {
   try {
-    // 🐶 Créé un nouvelle Transaction
+    // 🐶 Crée un nouvelle Transaction
 
     // 🤖
     // const newBalance = await db.transaction(async (tx) => {

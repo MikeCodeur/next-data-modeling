@@ -32,8 +32,8 @@ export function ProductsTable({products}: {products?: ProductWithCategory[]}) {
             <TableCell>
               {/* Type Guard
 
-              Juste pour les besoins de l'exercice car 'getCategoriesByIdWithProducts' change durant les exercices
-               Mais en temps normal nous savons à l'avance si category est l'id ou l'object) 
+              Juste pour les besoins de l'exercice car `getCategoriesByIdWithProducts` change durant les exercices
+               Mais en temps normal nous savons à l'avance si `category` est l'id ou l'object) 
               {product.category}
               {product.category.name}
               */}
