@@ -55,31 +55,37 @@ De cette manière on peut dire :
 **Avec Drizzle**
 
 ```tsx
+export const students = pgTable('students', {
+  id: serial('id').primaryKey(),
+  name: varchar('name', {length: 255}).notNull(),
+  email: varchar('email', {length: 255}).notNull().unique(),
+  enrollment_date: date('enrollment_date').notNull(),
+})
 
-export const students = pgTable("students", {
-    id: serial("id").primaryKey(),
-    name: varchar("name", { length: 255 }).notNull(),
-    email: varchar("email", { length: 255 }).notNull().unique(),
-    enrollment_date: date("enrollment_date").notNull(),
-});
+export const courses = pgTable('courses', {
+  id: serial('id').primaryKey(),
+  course_name: varchar('course_name', {length: 255}).notNull(),
+  course_code: varchar('course_code', {length: 100}).notNull().unique(),
+  credits: integer('credits').notNull(),
+})
 
-export const courses = pgTable("courses", {
-    id: serial("id").primaryKey(),
-    course_name: varchar("course_name", { length: 255 }).notNull(),
-    course_code: varchar("course_code", { length: 100 }).notNull().unique(),
-    credits: integer("credits").notNull(),
-});
-
-export const studentCourses = pgTable("student_courses", {
-    student_id: integer("student_id").notNull().references(() => students.id),
-    course_id: integer("course_id").notNull().references(() => courses.id),
-},
-(table) => ({
-    pk: primaryKey(table.student_id, table.course_id)
-}));
+export const studentCourses = pgTable(
+  'student_courses',
+  {
+    student_id: integer('student_id')
+      .notNull()
+      .references(() => students.id),
+    course_id: integer('course_id')
+      .notNull()
+      .references(() => courses.id),
+  },
+  (table) => ({
+    pk: primaryKey(table.student_id, table.course_id),
+  })
+)
 
 // RELATION
-export const studentCoursesRelations = relations(studentCourses, ({ one }) => ({
+export const studentCoursesRelations = relations(studentCourses, ({one}) => ({
   student: one(students, {
     fields: [studentCourses.student_id],
     references: [students.id],
@@ -88,21 +94,21 @@ export const studentCoursesRelations = relations(studentCourses, ({ one }) => ({
     fields: [studentCourses.course_id],
     references: [courses.id],
   }),
-}));
+}))
 // Optionnel : Relations inversées pour `students` et `courses`
-export const studentsRelations = relations(students, ({ many }) => ({
+export const studentsRelations = relations(students, ({many}) => ({
   courses: many(studentCourses, {
     fields: [studentCourses.student_id],
     references: [students.id],
   }),
-}));
+}))
 
-export const coursesRelations = relations(courses, ({ many }) => ({
+export const coursesRelations = relations(courses, ({many}) => ({
   students: many(studentCourses, {
     fields: [studentCourses.course_id],
     references: [courses.id],
   }),
-}));
+}))
 ```
 
 📑 Le liens vers la doc [https://orm.drizzle.team/docs/rqb#many-to-many](https://orm.drizzle.team/docs/rqb#many-to-many)
@@ -174,21 +180,25 @@ Manipuler la table de jonction peut etre plus compliquer et moins claire dans le
 
 ```tsx
 //recuperation des groupes
-{user?.usersToGroups?.map((usersToGroup, index) => (
-  <Badge key={index} variant="secondary">
+{
+  user?.usersToGroups?.map((usersToGroup, index) => (
+    <Badge key={index} variant="secondary">
       {usersToGroup.group.name}
-  </Badge>
-))}
+    </Badge>
+  ))
+}
 ```
 
 Et pour récupérer les user : `group?.usersToGroups`
 
 ```tsx
-{group?.usersToGroups?.map((usersToGroup, index) => (
-      <Badge key={index} variant="secondary">
-        {usersToGroup.user.name}
-      </Badge>
-    ))}
+{
+  group?.usersToGroups?.map((usersToGroup, index) => (
+    <Badge key={index} variant="secondary">
+      {usersToGroup.user.name}
+    </Badge>
+  ))
+}
 ```
 
 Pour simplifier cela il suffit de spécifier la relation inverse exemple `usersRelations`
@@ -217,14 +227,14 @@ Les requetes sont maintenant simplifiées
 
 ```tsx
 const resultQuery = await db.query.users.findMany({
-    with: {
-      usersToGroups: {
-        with: {
-          group: true,
-        },
+  with: {
+    usersToGroups: {
+      with: {
+        group: true,
       },
     },
-  })
+  },
+})
 ```
 
 ```tsx

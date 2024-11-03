@@ -13,7 +13,7 @@ import Link from 'next/link'
 import {Label} from '@/components/ui/label'
 
 export default async function Page(props: {params: Promise<{group: string}>}) {
-  const params = await props.params;
+  const params = await props.params
   return (
     <div className="mx-auto max-w-4xl p-6 text-lg">
       <h1 className="mb-4 text-center text-3xl font-bold">
