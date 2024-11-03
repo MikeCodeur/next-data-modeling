@@ -8,15 +8,15 @@ import {count, eq} from 'drizzle-orm'
 
 export async function getProductsPagination(nbElement: number, start: number) {
   const resultQuery = await db.query.products.findMany({
-    // 🐶 Implémente la requete avec les caractéristiques suivantes :
+    // 🐶 Implémente la requête avec les caractéristiques suivantes :
     // offset: start,
     // limit: nbElement,
     // avec les categories
     // trier par id ascendant
   })
 
-  // 🐶 Utilise : db.select({count: count()} pour recuperer le nombre de produits
-  const rows = [{count: 10}] // Remplacer par le resultat de la requete
+  // 🐶 Utilise : db.select({count: count()} pour récupérer le nombre de produits
+  const rows = [{count: 10}] // Remplace par le résultat de la requête
 
   return {
     products: resultQuery,

@@ -20,16 +20,16 @@ export default async function Page({
   const nbElement = 4 // Nombre d'éléments par page
   const start = (currentPage - 1) * nbElement
 
-  // 🐶 Appelle getProductsPagination avec les bons params de pagination
+  // 🐶 Appelle `getProductsPagination` avec les bons params de pagination
   const {products, totalProducts} = await getProductsPagination(0, 0)
 
-  // 🐶 determine le nombre total de page grace à 'totalProducts' / 'nbElement'
+  // 🐶 Détermine le nombre total de page grace à `totalProducts` / `nbElement`
   const totalPages = 10
 
-  // 🐶 choisie le nombre de page à afficher dans la paginations
+  // 🐶 Choisis le nombre de page à afficher dans la paginations
   const maxPagesToShow = 5 // Maximum number of pagination links to show
 
-  // 🐶 Utilise le code ci-dessous pour determiner la page de départ visible et le nombre de page
+  // 🐶 Utilise le code ci-dessous pour déterminer la page de départ visible et le nombre de page
   // 🤖
   // let startPage = Math.max(currentPage - Math.floor(maxPagesToShow / 2), 1)
   // let endPage = startPage + maxPagesToShow - 1
@@ -53,18 +53,18 @@ export default async function Page({
       <div className="mt-5">
         <Pagination>
           <PaginationContent>
-            {/* 🐶 Créé le button précedent et desactive à la page 1 avec isActive={currentPage === 1}
+            {/* 🐶 Crée le button précédent et désactive à la page 1 avec `isActive={currentPage === 1}`
             
             <PaginationItem>
               <PaginationPrevious
                 href={
-                  // 🐶 determine le lien de la page precedente en fonction de 'currentPage'
+                  // 🐶 Détermine le lien de la page précédente en fonction de `currentPage`
                 }
                
               />
             </PaginationItem> */}
 
-            {/* 🤖 Utilise ce code pour afficher les pages visible de la paginations
+            {/* 🤖 Utilise ce code pour afficher les pages visibles de la paginations
              {pagesToShow.map((pageNum) => (
               <PaginationItem key={pageNum}>
                 <PaginationLink
@@ -79,10 +79,10 @@ export default async function Page({
               <PaginationEllipsis />
             </PaginationItem>
             <PaginationItem>
-              {/* 🐶 Créé le button suivant et desactive à dernière page
+              {/* 🐶 Crée le button suivant et désactive à la dernière page
               <PaginationNext
                 href={
-                  // 🐶 determine le lien de la page suivante en fonction de 'currentPage'
+                  // 🐶 Détermine le lien de la page suivante en fonction de `currentPage`
                 }
                 
               /> */}
