@@ -1,1 +1,1 @@
-export const moduleName = 'GIT STARTER'
+export const moduleName = 'Next Data Modeling'
