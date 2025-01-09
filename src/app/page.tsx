@@ -13,7 +13,7 @@ export default function Home() {
           <code className="font-mono font-bold">by Mike Codeur</code>
         </p>
         <div className="fixed bottom-0 left-0 flex h-48 w-full items-center justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:h-auto lg:w-auto lg:bg-none">
-          <Link className="flex items-center gap-2 p-2 lg:p-0" href="exercises">
+          {/* <Link className="flex items-center gap-2 p-2 lg:p-0" href="exercises">
             By{' '}
             <ImageTheme
               className="relative z-10"
@@ -24,7 +24,7 @@ export default function Home() {
               height={24}
               priority
             />
-          </Link>
+          </Link> */}
           <ModeToggle />
         </div>
       </div>
@@ -33,7 +33,7 @@ export default function Home() {
         <p className="z-10 mt-4 bg-gradient-to-r from-gray-500 to-gray-700 bg-clip-text p-2 text-6xl leading-none text-transparent dark:from-gray-200 dark:to-gray-500">
           {moduleName}
         </p>
-        <ImageTheme
+        {/* <ImageTheme
           className="relative z-10 mt-4"
           src="/NEXT-MASTERY-dark.png"
           srcInverse="/NEXT-MASTERY-light.png"
@@ -41,7 +41,7 @@ export default function Home() {
           width={400}
           height={37}
           priority
-        />
+        /> */}
       </div>
 
       <div className="mb-32 grid text-center lg:mb-0 lg:w-full lg:max-w-5xl lg:grid-cols-4 lg:text-left">
@@ -51,14 +51,13 @@ export default function Home() {
           rel="noopener noreferrer"
         >
           <h2 className={`mb-3 text-2xl font-semibold`}>
-            Instructions
+            MODULE 1
             <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
               -&gt;
             </span>
           </h2>
           <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Static Rendering. <br></br>Retrouve tous les details et les
-            instructions ici.
+            Introduction à Git et à la gestion de version.
           </p>
         </Link>
 
@@ -68,13 +67,13 @@ export default function Home() {
           rel="noopener noreferrer"
         >
           <h2 className={`mb-3 text-2xl font-semibold`}>
-            Exercices
+            MODULE 2
             <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
               -&gt;
             </span>
           </h2>
           <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Accès aux exercices.
+            Les bases de Git.
           </p>
         </Link>
 
@@ -84,13 +83,103 @@ export default function Home() {
           rel="noopener noreferrer"
         >
           <h2 className={`mb-3 text-2xl font-semibold`}>
-            static-rendering
+            MODULE 3
             <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
               -&gt;
             </span>
           </h2>
           <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Affichage des `posts` statiquement.
+            Gestion des branches.
+          </p>
+        </Link>
+        <Link
+          href="/exercises/static-rendering"
+          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
+          rel="noopener noreferrer"
+        >
+          <h2 className={`mb-3 text-2xl font-semibold`}>
+            MODULE 4
+            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
+              -&gt;
+            </span>
+          </h2>
+          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
+            Collaboration avec un dépôt distant.
+          </p>
+        </Link>
+        <Link
+          href="/exercises/static-rendering"
+          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
+          rel="noopener noreferrer"
+        >
+          <h2 className={`mb-3 text-2xl font-semibold`}>
+            MODULE 5
+            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
+              -&gt;
+            </span>
+          </h2>
+          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
+            Résolution des conflits.
+          </p>
+        </Link>
+        <Link
+          href="/exercises/static-rendering"
+          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
+          rel="noopener noreferrer"
+        >
+          <h2 className={`mb-3 text-2xl font-semibold`}>
+            MODULE 6
+            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
+              -&gt;
+            </span>
+          </h2>
+          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
+            Méthodologies Git pour les projets collaboratifs.
+          </p>
+        </Link>
+        <Link
+          href="/exercises/static-rendering"
+          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
+          rel="noopener noreferrer"
+        >
+          <h2 className={`mb-3 text-2xl font-semibold`}>
+            MODULE 7
+            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
+              -&gt;
+            </span>
+          </h2>
+          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
+            Manipulation de l'historique et annulations avancées.
+          </p>
+        </Link>
+        <Link
+          href="/exercises/static-rendering"
+          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
+          rel="noopener noreferrer"
+        >
+          <h2 className={`mb-3 text-2xl font-semibold`}>
+            MODULE 8
+            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
+              -&gt;
+            </span>
+          </h2>
+          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
+            Bonnes pratiques et outils avancés.
+          </p>
+        </Link>
+        <Link
+          href="/exercises/static-rendering"
+          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
+          rel="noopener noreferrer"
+        >
+          <h2 className={`mb-3 text-2xl font-semibold`}>
+            Bonus
+            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
+              -&gt;
+            </span>
+          </h2>
+          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
+            Projets pratiques.
           </p>
         </Link>
       </div>
